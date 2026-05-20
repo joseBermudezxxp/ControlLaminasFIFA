@@ -1,0 +1,333 @@
+/* ================= OVERLAY ================= */
+
+.sobre-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: var(--overlay);
+
+  backdrop-filter: blur(8px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  z-index: 5000;
+}
+
+/* ================= MODAL ================= */
+
+.sobre-modal {
+  width: 100%;
+  max-width: 700px;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  background: var(--bg-card-solid);
+
+  border: 1px solid var(--border-color);
+
+  border-radius: 28px;
+
+  padding: 35px;
+
+  position: relative;
+
+  box-shadow: var(--shadow-lg);
+}
+
+/* ================= CLOSE ================= */
+
+.sobre-close {
+  position: absolute;
+
+  top: 20px;
+  right: 20px;
+
+  width: 42px;
+  height: 42px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: var(--button-secondary-bg);
+
+  color: var(--button-secondary-text);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: var(--transition);
+}
+
+.sobre-close:hover {
+  background: var(--danger);
+
+  color: white;
+}
+
+/* ================= HEADER ================= */
+
+.sobre-header {
+  text-align: center;
+
+  margin-bottom: 30px;
+}
+
+.sobre-icon {
+  width: 75px;
+  height: 75px;
+
+  margin: auto auto 20px;
+
+  border-radius: 22px;
+
+  background: rgba(37,99,235,0.12);
+
+  color: var(--primary);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sobre-header h2 {
+  color: var(--text-primary);
+
+  font-size: 2rem;
+
+  margin-bottom: 10px;
+}
+
+.sobre-header p {
+  color: var(--text-secondary);
+
+  line-height: 1.6;
+}
+
+/* ================= FORM ================= */
+
+.sobre-form {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 20px;
+
+  margin-bottom: 35px;
+}
+
+.sobre-group {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.sobre-group label {
+  color: var(--text-primary);
+
+  font-weight: 600;
+}
+
+.sobre-group input,
+.sobre-group select {
+  width: 100%;
+
+  height: 55px;
+
+  border-radius: 14px;
+
+  border: 1px solid var(--input-border);
+
+  background: var(--input-bg);
+
+  color: var(--text-primary);
+
+  padding: 0 16px;
+
+  font-size: 1rem;
+
+  outline: none;
+
+  transition: var(--transition);
+}
+
+.sobre-group input:focus,
+.sobre-group select:focus {
+  border-color: var(--input-focus);
+
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
+}
+
+/* ================= BUTTON ================= */
+
+.sobre-add-btn {
+  grid-column: span 2;
+
+  height: 58px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  background: var(--primary);
+
+  color: white;
+
+  font-size: 1rem;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  cursor: pointer;
+
+  transition: var(--transition);
+}
+
+.sobre-add-btn:hover {
+  background: var(--primary-hover);
+
+  transform: translateY(-2px);
+}
+
+/* ================= RESULTS ================= */
+
+.sobre-results {
+  border-top: 1px solid var(--border-color);
+
+  padding-top: 25px;
+}
+
+.sobre-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 20px;
+}
+
+.sobre-results-header h3 {
+  color: var(--text-primary);
+}
+
+.sobre-results-header span {
+  background: var(--primary);
+
+  color: white;
+
+  padding: 6px 12px;
+
+  border-radius: 999px;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+/* ================= EMPTY ================= */
+
+.empty-state {
+  height: 180px;
+
+  border: 2px dashed var(--border-color);
+
+  border-radius: 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 15px;
+
+  color: var(--text-muted);
+}
+
+/* ================= LIST ================= */
+
+.added-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 15px;
+}
+
+.added-card {
+  background: var(--bg-card);
+
+  border: 1px solid var(--border-color);
+
+  border-radius: 18px;
+
+  padding: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+}
+
+.added-card h4 {
+  color: var(--text-primary);
+
+  margin-bottom: 5px;
+}
+
+.added-card p {
+  color: var(--text-secondary);
+
+  font-size: 0.95rem;
+}
+
+.added-card span {
+  background: rgba(34,197,94,0.15);
+
+  color: var(--success);
+
+  padding: 8px 14px;
+
+  border-radius: 999px;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+
+  .sobre-modal {
+    padding: 25px 18px;
+  }
+
+  .sobre-header h2 {
+    font-size: 1.6rem;
+  }
+
+  .sobre-form {
+    grid-template-columns: 1fr;
+  }
+
+  .sobre-add-btn {
+    grid-column: span 1;
+  }
+
+  .added-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

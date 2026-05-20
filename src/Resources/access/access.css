@@ -1,0 +1,267 @@
+/* ================= OVERLAY ================= */
+
+.access-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: var(--overlay);
+
+  backdrop-filter: blur(6px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  z-index: 5000;
+
+  animation: fadeIn 0.25s ease;
+}
+
+/* ================= MODAL ================= */
+
+.access-modal {
+  width: 100%;
+  max-width: 500px;
+
+  background: var(--bg-card-solid);
+
+  border: 1px solid var(--border-color);
+
+  border-radius: 28px;
+
+  padding: 30px;
+
+  position: relative;
+
+  box-shadow: var(--shadow-lg);
+
+  animation: scaleIn 0.3s ease;
+}
+
+/* ================= CLOSE ================= */
+
+.access-close {
+  position: absolute;
+
+  top: 18px;
+  right: 18px;
+
+  width: 40px;
+  height: 40px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: var(--button-secondary-bg);
+
+  color: var(--button-secondary-text);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: var(--transition);
+}
+
+.access-close:hover {
+  background: var(--danger);
+
+  color: white;
+}
+
+/* ================= HEADER ================= */
+
+.access-header {
+  text-align: center;
+
+  margin-bottom: 30px;
+}
+
+.access-icon {
+  width: 70px;
+  height: 70px;
+
+  margin: auto auto 20px;
+
+  border-radius: 20px;
+
+  background: rgba(37, 99, 235, 0.12);
+
+  color: var(--primary);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.access-header h2 {
+  color: var(--text-primary);
+
+  font-size: 1.8rem;
+
+  margin-bottom: 15px;
+}
+
+.access-header p {
+  color: var(--text-secondary);
+
+  line-height: 1.7;
+}
+
+/* ================= INPUT ================= */
+
+.access-input-group {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  margin-bottom: 30px;
+}
+
+.access-input-group label {
+  color: var(--text-primary);
+
+  font-weight: 600;
+}
+
+.access-input-group input {
+  width: 100%;
+
+  height: 55px;
+
+  padding: 0 16px;
+
+  border-radius: 14px;
+
+  border: 1px solid var(--input-border);
+
+  background: var(--input-bg);
+
+  color: var(--text-primary);
+
+  font-size: 1rem;
+
+  outline: none;
+
+  transition: var(--transition);
+}
+
+.access-input-group input:focus {
+  border-color: var(--input-focus);
+
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
+}
+
+.access-input-group small {
+  color: var(--text-muted);
+
+  line-height: 1.5;
+}
+
+/* ================= BUTTONS ================= */
+
+.access-buttons {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+}
+
+.access-buttons button {
+  flex: 1;
+
+  height: 52px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  font-size: 1rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: var(--transition);
+}
+
+.skip-btn {
+  background: var(--button-secondary-bg);
+
+  color: var(--button-secondary-text);
+}
+
+.skip-btn:hover {
+  opacity: 0.85;
+}
+
+.save-btn {
+  background: var(--primary);
+
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+}
+
+.save-btn:hover {
+  background: var(--primary-hover);
+
+  transform: translateY(-2px);
+}
+
+/* ================= ANIMATIONS ================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 600px) {
+
+  .access-modal {
+    padding: 25px 20px;
+  }
+
+  .access-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .access-buttons {
+    flex-direction: column;
+  }
+
+  .access-buttons button {
+    width: 100%;
+  }
+}

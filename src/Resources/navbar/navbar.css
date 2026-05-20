@@ -1,0 +1,275 @@
+/* ================= NAVBAR ================= */
+
+.navbar {
+  width: 100%;
+  height: 75px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 30px;
+
+  background: var(--bg-card);
+
+  backdrop-filter: blur(12px);
+
+  border-bottom: 1px solid var(--border-color);
+
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  z-index: 1000;
+
+  transition:
+    transform 0.35s ease,
+    opacity 0.35s ease;
+}
+
+.navbar.show {
+  transform: translateY(0);
+
+  opacity: 1;
+}
+
+.navbar.hide {
+  transform: translateY(-100%);
+
+  opacity: 0;
+}
+
+/* ================= LOGO ================= */
+
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+
+  color: var(--text-primary);
+
+  transition: 0.3s ease;
+}
+
+/* ================= DESKTOP LINKS ================= */
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+}
+
+.nav-btn {
+  height: 45px;
+
+  padding: 0 18px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: var(--button-secondary-bg);
+
+  color: var(--button-secondary-text);
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  cursor: pointer;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  transition: var(--transition);
+}
+
+.nav-btn:hover {
+  background: var(--primary);
+
+  color: white;
+
+  transform: translateY(-2px);
+}
+
+.logout:hover {
+  background: var(--danger);
+}
+
+/* ================= MOBILE BUTTON ================= */
+
+.menu-toggle {
+  display: none;
+
+  background: transparent;
+
+  border: none;
+
+  color: var(--text-primary);
+
+  cursor: pointer;
+}
+
+/* ================= OVERLAY ================= */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+
+  background: var(--overlay);
+
+  opacity: 0;
+
+  visibility: hidden;
+
+  transition: 0.3s ease;
+
+  z-index: 1200;
+}
+
+.overlay.show {
+  opacity: 1;
+
+  visibility: visible;
+}
+
+/* ================= MOBILE MENU ================= */
+
+.mobile-menu {
+  position: fixed;
+
+  top: 0;
+  left: -320px;
+
+  width: 300px;
+  max-width: 85%;
+
+  height: 100vh;
+
+  background: var(--bg-card-solid);
+
+  border-right: 1px solid var(--border-color);
+
+  box-shadow: var(--shadow-lg);
+
+  z-index: 1300;
+
+  transition: 0.35s ease;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-menu.open {
+  left: 0;
+}
+
+/* ================= MOBILE HEADER ================= */
+
+.mobile-header {
+  height: 75px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 20px;
+
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mobile-header h2 {
+  color: var(--text-primary);
+}
+
+.close-btn {
+  background: transparent;
+
+  border: none;
+
+  color: var(--text-primary);
+
+  cursor: pointer;
+}
+
+/* ================= MOBILE LINKS ================= */
+
+.mobile-links {
+  display: flex;
+  flex-direction: column;
+
+  padding: 20px;
+
+  gap: 15px;
+}
+
+.mobile-link {
+  width: 100%;
+
+  height: 52px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: var(--button-secondary-bg);
+
+  color: var(--button-secondary-text);
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 0 18px;
+
+  font-size: 1rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: var(--transition);
+}
+
+.mobile-link:hover {
+  background: var(--primary);
+
+  color: white;
+}
+
+.mobile-link.logout:hover {
+  background: var(--danger);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+
+  .navbar {
+    padding: 0 20px;
+  }
+
+  /* SOLO ESCONDER LOGO */
+  body.hide-mobile-logo .navbar-logo {
+    opacity: 0;
+
+    transform: translateY(-10px);
+  }
+
+  .navbar-links {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  /* EN MOBILE EL NAVBAR SIEMPRE SE VE */
+  .navbar.hide {
+    transform: translateY(0);
+
+    opacity: 1;
+  }
+}

@@ -1,0 +1,226 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================================================
+    // FUNCIONES GENERALES
+    // =========================================================
+
+    // Verifica si el usuario inició sesión
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Verifica si el usuario es dueño del documento
+    function isOwner(userId) {
+      return request.auth != null
+        && request.auth.uid == userId;
+    }
+
+    // Verifica si el usuario es administrador
+    // IMPORTANTE:
+    // El admin debe tener custom claims:
+    // admin: true
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.admin == true;
+    }
+
+    // =========================================================
+    // USUARIOS
+    // =========================================================
+    // usuarios/{uid}
+    //
+    // Cada usuario:
+    // - puede crear su propio perfil
+    // - puede leer su propio perfil
+    // - puede editar su propio perfil
+    //
+    // Solo admin:
+    // - puede eliminar usuarios
+    // =========================================================
+
+    match /usuarios/{userId} {
+
+      // Crear perfil propio
+      allow create: if isOwner(userId);
+
+      // Leer perfil propio
+      allow read: if isOwner(userId);
+
+      // Editar perfil propio
+      allow update: if isOwner(userId);
+
+      // Solo admin elimina
+      allow delete: if isAdmin();
+    }
+
+    // =========================================================
+    // COMENTARIOS
+    // =========================================================
+    // comentarios/{commentId}
+    //
+    // Usuarios autenticados:
+    // - pueden crear comentarios
+    //
+    // Solo admin:
+    // - puede leer comentarios
+    // - editar comentarios
+    // - eliminar comentarios
+    // =========================================================
+
+    match /comentarios/{commentId} {
+
+      // Crear comentario
+      allow create: if isAuthenticated();
+
+      // Solo admin puede leer
+      allow read: if isAdmin();
+
+      // Solo admin modifica
+      allow update: if isAdmin();
+
+      // Solo admin elimina
+      allow delete: if isAdmin();
+    }
+
+    // =========================================================
+    // MUNDIAL
+    // =========================================================
+    // mundial/{worldcupId}
+    //
+    // Público:
+    // - puede ver mundiales
+    //
+    // Solo admin:
+    // - crea
+    // - edita
+    // - elimina
+    // =========================================================
+
+    match /mundial/{worldcupId} {
+
+      // Lectura pública
+      allow read: if true;
+
+      // Solo admin modifica
+      allow create, update, delete: if isAdmin();
+    }
+
+    // =========================================================
+    // CATEGORIAS
+    // =========================================================
+    // categorias/{categoryId}
+    //
+    // Público:
+    // - puede ver categorías
+    //
+    // Solo admin:
+    // - crea
+    // - edita
+    // - elimina
+    // =========================================================
+
+    match /categorias/{categoryId} {
+
+      // Lectura pública
+      allow read: if true;
+
+      // Solo admin modifica
+      allow create, update, delete: if isAdmin();
+    }
+
+    // =========================================================
+    // EQUIPOS
+    // =========================================================
+    // equipos/{teamId}
+    //
+    // Público:
+    // - puede ver equipos
+    //
+    // Solo admin:
+    // - crea
+    // - edita
+    // - elimina
+    // =========================================================
+
+    match /equipos/{teamId} {
+
+      // Lectura pública
+      allow read: if true;
+
+      // Solo admin modifica
+      allow create, update, delete: if isAdmin();
+    }
+
+    // =========================================================
+    // ESTAMPITAS
+    // =========================================================
+    // estampitas/{stickerId}
+    //
+    // Público:
+    // - puede ver estampitas
+    //
+    // Solo admin:
+    // - crea
+    // - edita
+    // - elimina
+    // =========================================================
+
+    match /estampitas/{stickerId} {
+
+      // Lectura pública
+      allow read: if true;
+
+      // Solo admin modifica
+      allow create, update, delete: if isAdmin();
+    }
+
+    // =========================================================
+    // ALBUM USUARIO
+    // =========================================================
+    // album_usuario/{albumId}
+    //
+    // Cada usuario:
+    // - puede ver sus estampitas
+    // - puede agregarlas
+    // - puede editarlas
+    // - puede eliminarlas
+    //
+    // IMPORTANTE:
+    // Se valida usando el campo:
+    // idUsuario
+    // =========================================================
+
+    match /album_usuario/{albumId} {
+
+      // Leer solo si el álbum pertenece al usuario
+      allow read: if isAuthenticated()
+        && resource.data.idUsuario == request.auth.uid;
+
+      // Crear solo si pertenece al usuario
+      allow create: if isAuthenticated()
+        && request.resource.data.idUsuario == request.auth.uid;
+
+      // Actualizar solo si pertenece al usuario
+      allow update: if isAuthenticated()
+        && resource.data.idUsuario == request.auth.uid;
+
+      // Eliminar solo si pertenece al usuario
+      allow delete: if isAuthenticated()
+        && resource.data.idUsuario == request.auth.uid;
+    }
+
+    // =========================================================
+    // BLOQUEO TOTAL POR DEFECTO
+    // =========================================================
+    // Cualquier colección no definida:
+    // acceso denegado
+    // =========================================================
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
