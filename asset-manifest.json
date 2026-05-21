@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/ControlLaminasFIFA/static/css/main.60c536dd.css",
+    "main.js": "/ControlLaminasFIFA/static/js/main.16d5eadc.js",
+    "static/js/453.46c320e9.chunk.js": "/ControlLaminasFIFA/static/js/453.46c320e9.chunk.js",
+    "index.html": "/ControlLaminasFIFA/index.html",
+    "main.60c536dd.css.map": "/ControlLaminasFIFA/static/css/main.60c536dd.css.map",
+    "main.16d5eadc.js.map": "/ControlLaminasFIFA/static/js/main.16d5eadc.js.map",
+    "453.46c320e9.chunk.js.map": "/ControlLaminasFIFA/static/js/453.46c320e9.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.60c536dd.css",
+    "static/js/main.16d5eadc.js"
+  ]
+}
