@@ -1,0 +1,235 @@
+/* ============================================================
+   PANTALLA DE CARGA - MUNDIAL DE FÚTBOL
+   Variables resueltas a valores directos (sin depender de :root externo)
+   ============================================================ */
+
+.wc-loader__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0f172a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.wc-loader__overlay.wc-loader--hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.wc-loader__field {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px, transparent 48px,
+      rgba(255,255,255,0.6) 48px, rgba(255,255,255,0.6) 50px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px, transparent 48px,
+      rgba(255,255,255,0.4) 48px, rgba(255,255,255,0.4) 50px
+    );
+}
+
+.wc-loader__arc {
+  position: absolute;
+  top: -90px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 360px;
+  height: 180px;
+  border: 2px solid rgba(255,255,255,0.06);
+  border-radius: 0 0 180px 180px;
+  border-top: none;
+}
+
+.wc-loader__center-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.05);
+}
+
+.wc-loader__body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+.wc-loader__ball-wrap {
+  position: relative;
+  width: 96px;
+  height: 96px;
+}
+
+.wc-loader__ball {
+  width: 96px;
+  height: 96px;
+  animation: wc-bounce 1.2s cubic-bezier(0.36, 0, 0.66, 1) infinite;
+}
+
+.wc-loader__ball-shadow {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 10px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: wc-shadow 1.2s cubic-bezier(0.36, 0, 0.66, 1) infinite;
+}
+
+.wc-loader__title {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wc-loader__title-top {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);   /* --text-muted */
+}
+
+.wc-loader__title-main {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;                  /* --text-primary */
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.wc-loader__title-accent {
+  color: #3b82f6;                  /* --primary */
+}
+
+.wc-loader__progress-wrap {
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.wc-loader__progress-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.1);  /* --border-color */
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.wc-loader__progress-bar {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #3b82f6 0%, #06b6d4 100%);  /* --primary → --secondary */
+  transition: width 0.4s ease;
+  animation: wc-progress 2.8s ease-in-out forwards;
+}
+
+.wc-loader__progress-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);   /* --text-muted */
+  letter-spacing: 0.05em;
+  transition: opacity 0.3s ease;
+}
+
+.wc-loader__flags {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  animation: wc-fadein 0.8s ease 0.3s both;
+}
+
+.wc-loader__flag {
+  font-size: 22px;
+  line-height: 1;
+  opacity: 0.55;
+  filter: saturate(0.7);
+}
+
+.wc-loader__stars {
+  position: absolute;
+  top: 18px;
+  display: flex;
+  gap: 6px;
+  opacity: 0.45;
+  animation: wc-fadein 1s ease 0.6s both;
+}
+
+.wc-loader__star {
+  color: #f59e0b;                  /* --warning */
+  font-size: 10px;
+}
+
+.wc-loader__confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.wc-loader__dot {
+  position: absolute;
+  opacity: 0;
+  animation: wc-float var(--wc-dur, 4s) ease-in var(--wc-delay, 0s) infinite;
+}
+
+@keyframes wc-bounce {
+  0%, 100% { transform: translateY(0px)   rotate(0deg); }
+  30%       { transform: translateY(-36px) rotate(120deg); }
+  50%       { transform: translateY(-40px) rotate(180deg); }
+  70%       { transform: translateY(-18px) rotate(270deg); }
+}
+
+@keyframes wc-shadow {
+  0%, 100% { transform: translateX(-50%) scaleX(1);    opacity: 0.5; }
+  50%       { transform: translateX(-50%) scaleX(0.4); opacity: 0.2; }
+}
+
+@keyframes wc-progress {
+  0%   { width: 0%; }
+  20%  { width: 22%; }
+  45%  { width: 51%; }
+  70%  { width: 74%; }
+  90%  { width: 91%; }
+  100% { width: 97%; }
+}
+
+@keyframes wc-float {
+  0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+  10%  { opacity: 0.7; }
+  90%  { opacity: 0.5; }
+  100% { transform: translateY(-20px) scale(1.2); opacity: 0; }
+}
+
+@keyframes wc-fadein {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wc-loader__ball,
+  .wc-loader__ball-shadow,
+  .wc-loader__dot        { animation: none; }
+  .wc-loader__progress-bar { animation: none; width: 75%; }
+}

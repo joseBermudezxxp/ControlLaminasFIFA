@@ -1,222 +1,279 @@
-import React, { useState } from "react";
-
+import React, { useEffect, useState } from "react";
 import "./switchcards.css";
 
-import {
-  X,
-  Gift,
-  Repeat,
-  Check,
-} from "lucide-react";
+import { X, Check } from "lucide-react";
 
-const SwitchCards = ({ onClose }) => {
+const SwitchCards = ({
+  onClose,
+  laminas = [],
+  userId,
+  albumId,
+}) => {
+  const [input, setInput] = useState("");
+  const [results, setResults] = useState([]);
+  const [selected, setSelected] = useState({});
+  const [mode, setMode] = useState("abrir");
+  const [ownedCounts, setOwnedCounts] = useState({});
+  const [loadingOwned, setLoadingOwned] = useState(true);
+  const [foundAnimation, setFoundAnimation] = useState(null);
 
-  // ================= MODE =================
-  const [mode, setMode] = useState("switch");
+  // ================= INPUT =================
+  const handleInput = (e) => {
+    let value = e.target.value.toUpperCase();
+    value = value.replace(/[^A-Z0-9]/g, "");
 
-  // ================= MOCK DATA =================
-  const missingCards = [
-    {
-      id: 1,
-      number: 10,
-      name: "Lionel Messi",
-      image:
-        "https://picsum.photos/200/300?1",
-    },
-    {
-      id: 2,
-      number: 25,
-      name: "Cristiano Ronaldo",
-      image:
-        "https://picsum.photos/200/300?2",
-    },
-    {
-      id: 3,
-      number: 40,
-      name: "James Rodríguez",
-      image:
-        "https://picsum.photos/200/300?3",
-    },
-  ];
+    if (value.length > 5) return;
 
-  const repeatedCards = [
-    {
-      id: 4,
-      number: 88,
-      name: "Neymar Jr",
-      image:
-        "https://picsum.photos/200/300?4",
-    },
-    {
-      id: 5,
-      number: 91,
-      name: "Mbappé",
-      image:
-        "https://picsum.photos/200/300?5",
-    },
-  ];
+    setInput(value);
+  };
+
+  const isValidCode = (code) => /^[A-Z]{3}[0-9]{2}$/.test(code);
+
+  // ================= BUSQUEDA EN TIEMPO REAL =================
+  useEffect(() => {
+    if (!isValidCode(input)) {
+      setResults([]);
+      return;
+    }
+
+    const found = laminas.find(
+      (l) =>
+        (l?.codigo || l?.id || "")
+          .toString()
+          .toUpperCase() === input
+    );
+
+    if (found?.id) {
+      setResults([found]);
+      setFoundAnimation(found.id);
+    } else {
+      setResults([]);
+    }
+  }, [input, laminas]);
+
+  // ================= ANIMACION =================
+  useEffect(() => {
+    if (!foundAnimation) return;
+
+    const timer = setTimeout(() => {
+      setFoundAnimation(null);
+    }, 700);
+
+    return () => clearTimeout(timer);
+  }, [foundAnimation]);
+
+  // ================= SELECT =================
+  const handleSelect = (lamina) => {
+    if (!lamina?.id) return;
+
+    setSelected((prev) => {
+      const current = prev[lamina.id] || 0;
+
+      return {
+        ...prev,
+        [lamina.id]: current + 1,
+      };
+    });
+  };
+
+  // ================= SAFE LOOKUP =================
+  const getLaminaById = (id) => laminas.find((l) => l?.id === id) || null;
+
+  useEffect(() => {
+    if (!userId || !albumId) return;
+
+    const loadOwnedCounts = async () => {
+      setLoadingOwned(true);
+      try {
+        const { doc, getDoc } = await import("firebase/firestore");
+        const { db } = await import("../../server/api");
+
+        const ref = doc(db, "album_usuario", `${userId}_${albumId}`);
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          setOwnedCounts(snap.data()?.laminas || {});
+        } else {
+          setOwnedCounts({});
+        }
+      } catch (error) {
+        console.error("Error cargando láminas propias:", error);
+      } finally {
+        setLoadingOwned(false);
+      }
+    };
+
+    loadOwnedCounts();
+  }, [albumId, userId]);
+
+  const isGiftMode = mode === "regalar";
+
+  // ================= GUARDAR EN FIRESTORE =================
+  const saveAllToFirestore = async () => {
+    if (!userId || !albumId) {
+      console.warn("Faltan userId o albumId");
+      return;
+    }
+
+    const { doc, getDoc, setDoc } = await import("firebase/firestore");
+    const { db } = await import("../../server/api");
+
+    const ref = doc(db, "album_usuario", `${userId}_${albumId}`);
+
+    try {
+      const snap = await getDoc(ref);
+
+      let existing = {};
+
+      if (snap.exists()) {
+        existing = snap.data()?.laminas || {};
+      }
+
+      const updated = { ...existing };
+
+      Object.entries(selected).forEach(([id, qty]) => {
+        const current = Number(existing[id] || 0);
+
+        if (isGiftMode) {
+          const remaining = current - qty;
+          if (remaining > 0) {
+            updated[id] = remaining;
+          } else {
+            delete updated[id];
+          }
+        } else {
+          updated[id] = current + qty;
+        }
+      });
+
+      await setDoc(ref, { laminas: updated }, { merge: true });
+
+      alert(isGiftMode ? "🎁 Láminas regaladas" : "🔥 Guardado en tu álbum");
+
+      setSelected({});
+    } catch (err) {
+      console.error("Error guardando:", err);
+    }
+  };
 
   return (
     <div className="switch-overlay">
-
       <div className="switch-modal">
 
         {/* CLOSE */}
-        <button
-          className="switch-close"
-          onClick={onClose}
-        >
+        <button className="switch-close" onClick={onClose}>
           <X size={22} />
         </button>
 
         {/* HEADER */}
         <div className="switch-header">
-
-          <h2>
-            Intercambio de Estampitas
-          </h2>
-
+          <h2>Buscador de Láminas</h2>
           <p>
-            Encuentra usuarios para cambiar o
-            regalar estampitas repetidas.
+            {isGiftMode
+              ? "Regala láminas que ya tienes y réstalas de tu colección."
+              : "Busca por código y guarda nuevas láminas en tu álbum."}
           </p>
-
         </div>
 
-        {/* MODES */}
         <div className="switch-modes">
-
           <button
-            className={
-              mode === "switch"
-                ? "mode-btn active"
-                : "mode-btn"
-            }
-            onClick={() => setMode("switch")}
+            type="button"
+            className={`mode-btn ${!isGiftMode ? "active" : ""}`}
+            onClick={() => setMode("abrir")}
           >
-            <Repeat size={18} />
-            Cambiar
+            Abrir
           </button>
-
           <button
-            className={
-              mode === "gift"
-                ? "mode-btn active"
-                : "mode-btn"
-            }
-            onClick={() => setMode("gift")}
+            type="button"
+            className={`mode-btn ${isGiftMode ? "active" : ""}`}
+            onClick={() => setMode("regalar")}
           >
-            <Gift size={18} />
-            Dar
+            Regalar
           </button>
-
         </div>
 
-        {/* SWITCH MODE */}
-        {mode === "switch" && (
-          <div className="cards-section">
+        <div className="section-info">
+          <h3>{isGiftMode ? "Regalar láminas" : "Abrir nuevas láminas"}</h3>
+          <p>
+            {isGiftMode
+              ? "Selecciona las láminas que quieres regalar. Se restarán de tu álbum actual."
+              : "Busca el código de la lámina y agrégala a tu álbum. Si ya tienes varias, solo una cuenta para el porcentaje."}
+          </p>
+        </div>
 
-            <div className="section-info">
+        {/* INPUT */}
+        <input
+          className="open-input"
+          placeholder="ABC12"
+          value={input}
+          onChange={handleInput}
+        />
 
-              <h3>
-                Estampitas faltantes
-              </h3>
+        {/* RESULTADOS */}
+        <div className="cards-grid">
+          {results.map((lamina) => (
+            <div
+              key={lamina.id}
+              className={`card-item ${
+                foundAnimation === lamina.id ? "found" : ""
+              }`}
+            >
+              <img src={lamina?.bandera || ""} />
 
-              <p>
-                Selecciona las estampitas que
-                estás buscando para encontrar
-                usuarios que las tengan.
-              </p>
+              <div className="card-content">
+                <span>#{lamina?.numero}</span>
+                <h4>{lamina?.nombre}</h4>
 
-            </div>
+                {isGiftMode && (
+                  <p style={{ marginBottom: 12, color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+                    Disponibles: {ownedCounts[lamina.id] || 0}
+                  </p>
+                )}
 
-            <div className="cards-grid">
-
-              {missingCards.map((card) => (
-                <div
-                  key={card.id}
-                  className="card-item"
+                <button
+                  className={isGiftMode ? "gift-btn" : ""}
+                  onClick={() => handleSelect(lamina)}
+                  disabled={isGiftMode && (ownedCounts[lamina.id] || 0) === 0}
                 >
-
-                  <img
-                    src={card.image}
-                    alt={card.name}
-                  />
-
-                  <div className="card-content">
-
-                    <span>
-                      #{card.number}
-                    </span>
-
-                    <h4>{card.name}</h4>
-
-                    <button>
-                      <Check size={16} />
-                      La necesito
-                    </button>
-
-                  </div>
-
-                </div>
-              ))}
-
+                  <Check size={16} />
+                  {isGiftMode ? "Regalar" : "Guardar"}
+                </button>
+              </div>
             </div>
+          ))}
+        </div>
 
-          </div>
-        )}
+        {/* SELECCIONADOS */}
+        <h4 style={{ marginTop: 20 }}>Seleccionados</h4>
 
-        {/* GIFT MODE */}
-        {mode === "gift" && (
-          <div className="cards-section">
+        <div className="selected-list">
+          {Object.entries(selected).map(([id, qty]) => {
+            const lamina = getLaminaById(id);
 
-            <div className="section-info">
+            return (
+              <div key={id} className="selected-item">
+                <span>{lamina?.nombre || "Lámina"}</span>
+                <strong>x{qty}</strong>
+              </div>
+            );
+          })}
+        </div>
 
-              <h3>
-                Regalar repetidas
-              </h3>
-
-              <p>
-                Comparte estampitas repetidas
-                con otros usuarios.
-              </p>
-
-            </div>
-
-            <div className="cards-grid">
-
-              {repeatedCards.map((card) => (
-                <div
-                  key={card.id}
-                  className="card-item"
-                >
-
-                  <img
-                    src={card.image}
-                    alt={card.name}
-                  />
-
-                  <div className="card-content">
-
-                    <span>
-                      #{card.number}
-                    </span>
-
-                    <h4>{card.name}</h4>
-
-                    <button className="gift-btn">
-                      <Gift size={16} />
-                      Regalar
-                    </button>
-
-                  </div>
-
-                </div>
-              ))}
-
-            </div>
-
-          </div>
+        {/* BOTÓN FINAL */}
+        {Object.keys(selected).length > 0 && (
+          <button
+            className="open-pack-btn"
+            style={{
+              marginTop: "20px",
+              background: isGiftMode
+                ? "linear-gradient(135deg, #00b0ff, #0091ea)"
+                : "linear-gradient(135deg, #00c853, #00e676)",
+              fontWeight: "700",
+            }}
+            onClick={saveAllToFirestore}
+          >
+            {isGiftMode ? "Regalar de mi álbum" : "Guardar en mi álbum"}
+          </button>
         )}
 
       </div>

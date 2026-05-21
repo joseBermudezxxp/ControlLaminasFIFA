@@ -38,12 +38,9 @@ const Login = () => {
         },
         { merge: true }
       );
-
-      alert(`Bienvenido ${fullName}`);
     } catch (error) {
       console.error(error);
       alert("Error al iniciar sesión");
-    } finally {
       setLoading(false);
     }
   };
@@ -55,13 +52,12 @@ const Login = () => {
 
         <p>Inicia sesión con Google</p>
 
-        <button className="google-btn" onClick={loginGoogle}>
+        <button className="google-btn" onClick={loginGoogle} disabled={loading} aria-busy={loading}>
           <img
             src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
             alt="Google"
           />
-
-          {loading ? "Cargando..." : "Continuar con Google"}
+          Continuar con Google
         </button>
       </div>
     </div>

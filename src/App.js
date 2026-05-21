@@ -1,230 +1,100 @@
-// App.js
-
-import React, {
-  useEffect,
-  useState,
-} from "react";
-
-import {
-  onAuthStateChanged,
-} from "firebase/auth";
-
-import {
-  doc,
-  getDoc,
-} from "firebase/firestore";
-
-import {
-  auth,
-  db,
-} from "./server/api";
+import React, { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { auth, db } from "./server/api";
 
 import Login from "./Components/login/login";
-
 import Navbar from "./Resources/navbar/navbar";
-
 import Home from "./Components/home/home";
-
 import Footer from "./Resources/footer/footer";
-
 import Cargar from "./Components/adminalbum/cargar";
-
 import AdquirirAlbum from "./Components/adminalbum/adquiriralbum/adquiriralbum";
-
 import CargarLaminas from "./Components/adminalbum/cargarlaminas";
+import Contenido from "./Components/home/contenido/contenido";
+
+// ✅ Importa el componente React, no como script suelto
+import Carga from "./Resources/carga/carga";
 
 import "./App.css";
 
 function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [albums, setAlbums] = useState([]);
 
-  const [user, setUser] =
-    useState(null);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  // MODALS
-  const [
-    cargarModalOpen,
-    setCargarModalOpen,
-  ] = useState(false);
-
-  const [
-    adquirirModalOpen,
-    setAdquirirModalOpen,
-  ] = useState(false);
-
-  const [
-    cargarLaminasOpen,
-    setCargarLaminasOpen,
-  ] = useState(false);
-
-  // =========================
-  // AUTH
-  // =========================
+  const [cargarModalOpen, setCargarModalOpen] = useState(false);
+  const [adquirirModalOpen, setAdquirirModalOpen] = useState(false);
+  const [cargarLaminasOpen, setCargarLaminasOpen] = useState(false);
+  const [selectedAlbum, setSelectedAlbum] = useState(null);
 
   useEffect(() => {
-
-    const unsubscribe =
-      onAuthStateChanged(
-        auth,
-        async (
-          currentUser
-        ) => {
-
-          if (currentUser) {
-
-            const userDocRef =
-              doc(
-                db,
-                "usuarios",
-                currentUser.uid
-              );
-
-            const userDocSnap =
-              await getDoc(
-                userDocRef
-              );
-
-            if (
-              userDocSnap.exists()
-            ) {
-
-              const userData =
-                userDocSnap.data();
-
-              setUser({
-                ...currentUser,
-
-                rol:
-                  userData.rol ||
-                  "usuario",
-              });
-
-            } else {
-
-              setUser(
-                currentUser
-              );
-
-            }
-
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      try {
+        if (currentUser) {
+          const userDocRef = doc(db, "usuarios", currentUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            setUser({ ...currentUser, rol: userData.rol || "usuario" });
           } else {
-
-            setUser(null);
-
+            setUser(currentUser);
           }
 
-          setLoading(false);
-
+          try {
+            const albumsQuery = query(
+              collection(db, "album_usuario"),
+              where("idUsuario", "==", currentUser.uid)
+            );
+            const albumsSnap = await getDocs(albumsQuery);
+            setAlbums(albumsSnap.docs.map((docu) => ({ id: docu.id, ...docu.data() })));
+          } catch (err) {
+            console.error("Error cargando álbumes en App:", err);
+            setAlbums([]);
+          }
+        } else {
+          setUser(null);
+          setAlbums([]);
         }
-      );
+      } finally {
+        setLoading(false);
+      }
+    });
 
-    return () =>
-      unsubscribe();
-
+    return () => unsubscribe();
   }, []);
 
-  // =========================
-  // LOADING
-  // =========================
-
-  if (loading) {
-
-    return (
-      <h2
-        style={{
-          textAlign:
-            "center",
-        }}
-      >
-        Cargando...
-      </h2>
-    );
-  }
-
-  // =========================
-  // LOGIN
-  // =========================
-
-  if (!user) {
-
-    return <Login />;
-
-  }
-
-  // =========================
-  // APP
-  // =========================
-
   return (
-    <div className="app-container">
+    <>
+      {/* ✅ El componente se muestra mientras loading=true y se oculta solo */}
+      <Carga visible={loading} />
 
-      <Navbar
-        user={user}
+      {/* ✅ Renderizamos todo siempre, Carga tapa la pantalla con position:fixed */}
+      {!loading && !user && <Login />}
 
-        onOpenCargar={() =>
-          setCargarModalOpen(
-            true
-          )
-        }
+      {!loading && user && (
+        <div className="app-container">
+          <Navbar
+            user={user}
+            onOpenCargar={() => setCargarModalOpen(true)}
+            onOpenAdquirir={() => setAdquirirModalOpen(true)}
+            onOpenCargarLaminas={() => setCargarLaminasOpen(true)}
+          />
 
-        onOpenAdquirir={() =>
-          setAdquirirModalOpen(
-            true
-          )
-        }
+          {selectedAlbum ? (
+            <Contenido album={selectedAlbum} onBack={() => setSelectedAlbum(null)} />
+          ) : (
+            <>
+              <Home user={user} albums={albums} onSelectAlbum={setSelectedAlbum} />
+              <Footer />
+            </>
+          )}
 
-        onOpenCargarLaminas={() =>
-          setCargarLaminasOpen(
-            true
-          )
-        }
-      />
-
-      {/* HOME */}
-      <Home user={user} />
-
-      {/* FOOTER */}
-      <Footer />
-
-      {/* CARGAR MUNDIAL */}
-      <Cargar
-        isOpen={
-          cargarModalOpen
-        }
-        onClose={() =>
-          setCargarModalOpen(
-            false
-          )
-        }
-      />
-
-      {/* ADQUIRIR */}
-      <AdquirirAlbum
-        isOpen={
-          adquirirModalOpen
-        }
-        onClose={() =>
-          setAdquirirModalOpen(
-            false
-          )
-        }
-      />
-
-      {/* CARGAR LAMINAS */}
-      <CargarLaminas
-        isOpen={
-          cargarLaminasOpen
-        }
-        onClose={() =>
-          setCargarLaminasOpen(
-            false
-          )
-        }
-      />
-
-    </div>
+          <Cargar isOpen={cargarModalOpen} onClose={() => setCargarModalOpen(false)} />
+          <AdquirirAlbum isOpen={adquirirModalOpen} onClose={() => setAdquirirModalOpen(false)} />
+          <CargarLaminas isOpen={cargarLaminasOpen} onClose={() => setCargarLaminasOpen(false)} />
+        </div>
+      )}
+    </>
   );
 }
 

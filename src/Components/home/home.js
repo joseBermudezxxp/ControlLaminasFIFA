@@ -1,98 +1,11 @@
 // home.js
 
-import React, {
-  useEffect,
-  useState,
-} from "react";
+import React from "react";
 
 import "./home.css";
+import { BookOpen } from "lucide-react";
 
-import {
-  db,
-} from "../../server/api";
-
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
-
-import {
-  BookOpen,
-} from "lucide-react";
-
-const Home = ({ user }) => {
-
-  const [albums, setAlbums] =
-    useState([]);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  useEffect(() => {
-
-    const fetchAlbums = async () => {
-
-      try {
-
-        const albumsQuery = query(
-          collection(
-            db,
-            "album_usuario"
-          ),
-          where(
-            "idUsuario",
-            "==",
-            user.uid
-          )
-        );
-
-        const albumsSnap =
-          await getDocs(
-            albumsQuery
-          );
-
-        const albumsData =
-          albumsSnap.docs.map(
-            (docu) => ({
-              id: docu.id,
-              ...docu.data(),
-            })
-          );
-
-        setAlbums(albumsData);
-
-      } catch (error) {
-
-        console.error(
-          "Error cargando álbumes:",
-          error
-        );
-
-      } finally {
-
-        setLoading(false);
-
-      }
-    };
-
-    fetchAlbums();
-
-  }, [user.uid]);
-
-  // =========================
-  // LOADING
-  // =========================
-
-  if (loading) {
-
-    return (
-      <div className="home-container">
-        <h2>Cargando...</h2>
-      </div>
-    );
-  }
+const Home = ({ user, albums = [], onSelectAlbum }) => {
 
   return (
     <div className="home-container">
@@ -141,6 +54,14 @@ const Home = ({ user }) => {
                 <div
                   key={album.id}
                   className="album-card"
+                  onClick={() =>
+                    onSelectAlbum(
+                      album
+                    )
+                  }
+                  style={{
+                    cursor: "pointer",
+                  }}
                 >
 
                   <img
