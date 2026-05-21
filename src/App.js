@@ -1,16 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "./server/api";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "./server/api";
 
 import Login from "./Components/login/login";
+import Navbar from "./Resources/navbar/navbar";
+import Home from "./Components/home/home";
+import Footer from "./Resources/footer/footer";
+import Cargar from "./Components/adminalbum/cargar";
+
+import "./App.css";
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [cargarModalOpen, setCargarModalOpen] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        // Obtener datos adicionales de Firestore (incluyendo rol)
+        const userDocRef = doc(db, "usuarios", currentUser.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          setUser({
+            ...currentUser,
+            rol: userData.rol || "usuario",
+          });
+        } else {
+          setUser(currentUser);
+        }
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
 
@@ -26,23 +50,13 @@ function App() {
     return <Login />;
   }
 
-  // 👤 Si hay usuario → app principal
+  // 👤 Si hay usuario → app principal con estructura completa
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Bienvenido 👋</h1>
-
-      <img
-        src={user.photoURL}
-        alt="foto"
-        style={{ width: 60, borderRadius: "50%" }}
-      />
-
-      <p>{user.displayName}</p>
-      <p>{user.email}</p>
-
-      <button onClick={() => signOut(auth)}>
-        Cerrar sesión
-      </button>
+    <div className="app-container">
+      <Navbar user={user} onOpenCargar={() => setCargarModalOpen(true)} />
+      <Home user={user} />
+      <Footer />
+      <Cargar isOpen={cargarModalOpen} onClose={() => setCargarModalOpen(false)} />
     </div>
   );
 }

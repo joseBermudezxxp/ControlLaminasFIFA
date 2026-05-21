@@ -8,6 +8,8 @@
   align-items: center;
   justify-content: space-between;
 
+  gap: 20px;
+
   padding: 0 30px;
 
   background: var(--bg-card);
@@ -43,12 +45,95 @@
 /* ================= LOGO ================= */
 
 .navbar-logo {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+
+  color: var(--primary);
+
+  transition: 0.3s ease;
+
+  letter-spacing: -1px;
+
+  flex-shrink: 0;
+
+  order: 1;
+}
+
+.navbar-logo:hover {
+  color: var(--secondary);
+}
+
+.navbar-profile {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  cursor: pointer;
+
+  transition: var(--transition);
+
+  flex: 0 1 auto;
+
+  min-width: 0;
+}
+
+.navbar-avatar {
+  width: 50px;
+  height: 50px;
+
+  border-radius: 50%;
+
+  border: 2px solid var(--primary);
+
+  object-fit: cover;
+
+  transition: var(--transition);
+
+  flex-shrink: 0;
+}
+
+.navbar-profile:hover .navbar-avatar {
+  border-color: var(--secondary);
+
+  transform: scale(1.05);
+}
+
+.navbar-info {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+
+  min-width: 0;
+
+  text-align: right;
+}
+
+.navbar-greeting {
+  font-size: 0.85rem;
+  font-weight: 500;
+
+  color: var(--text-secondary);
+
+  white-space: nowrap;
+}
+
+.navbar-name {
+  font-size: 1rem;
   font-weight: 700;
 
   color: var(--text-primary);
 
-  transition: 0.3s ease;
+  line-height: 1;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  max-width: 100px;
 }
 
 /* ================= DESKTOP LINKS ================= */
@@ -58,6 +143,12 @@
   align-items: center;
 
   gap: 15px;
+
+  order: 2;
+
+  flex: 1;
+
+  justify-content: flex-end;
 }
 
 .nav-btn {
@@ -110,6 +201,16 @@
   color: var(--text-primary);
 
   cursor: pointer;
+
+  flex-shrink: 0;
+
+  transition: var(--transition);
+}
+
+.menu-toggle:hover {
+  color: var(--primary);
+
+  transform: scale(1.1);
 }
 
 /* ================= OVERLAY ================= */
@@ -141,7 +242,7 @@
   position: fixed;
 
   top: 0;
-  left: -320px;
+  right: -320px;
 
   width: 300px;
   max-width: 85%;
@@ -150,7 +251,7 @@
 
   background: var(--bg-card-solid);
 
-  border-right: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
 
   box-shadow: var(--shadow-lg);
 
@@ -163,19 +264,19 @@
 }
 
 .mobile-menu.open {
-  left: 0;
+  right: 0;
 }
 
 /* ================= MOBILE HEADER ================= */
 
 .mobile-header {
-  height: 75px;
+  height: 50px;
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
 
-  padding: 0 20px;
+  padding: 0 15px;
 
   border-bottom: 1px solid var(--border-color);
 }
@@ -192,6 +293,63 @@
   color: var(--text-primary);
 
   cursor: pointer;
+
+  transition: var(--transition);
+}
+
+.close-btn:hover {
+  color: var(--primary);
+
+  transform: rotate(90deg);
+}
+
+/* ================= MOBILE LINKS ================= */
+
+.mobile-profile {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 20px;
+
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mobile-avatar {
+  width: 60px;
+  height: 60px;
+
+  border-radius: 50%;
+
+  border: 2px solid var(--primary);
+
+  object-fit: cover;
+
+  flex-shrink: 0;
+}
+
+.mobile-profile-info {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.mobile-greeting {
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  color: var(--text-secondary);
+}
+
+.mobile-profile-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+
+  color: var(--text-primary);
+
+  line-height: 1;
 }
 
 /* ================= MOBILE LINKS ================= */
@@ -248,22 +406,31 @@
 @media (max-width: 768px) {
 
   .navbar {
-    padding: 0 20px;
+    padding: 0 15px;
   }
 
-  /* SOLO ESCONDER LOGO */
-  body.hide-mobile-logo .navbar-logo {
-    opacity: 0;
+  .navbar-logo {
+    font-size: 1.1rem;
 
-    transform: translateY(-10px);
+    order: 1;
+  }
+
+  .navbar-profile {
+    display: none;
+
+    order: 3;
   }
 
   .navbar-links {
     display: none;
+
+    order: 2;
   }
 
   .menu-toggle {
     display: block;
+
+    order: 3;
   }
 
   /* EN MOBILE EL NAVBAR SIEMPRE SE VE */

@@ -1,0 +1,28 @@
+/* ================= APP CONTAINER ================= */
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 100vh;
+
+  background: var(--bg-primary);
+
+  color: var(--text-primary);
+}
+
+/* ================= MAIN CONTENT ================= */
+
+.app-container > div:nth-child(2) {
+  flex: 1;
+
+  margin-top: 75px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+  .app-container {
+    min-height: 100vh;
+  }
+}

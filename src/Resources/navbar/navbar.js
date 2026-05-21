@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-
+import { signOut } from "firebase/auth";
+import { auth } from "../../server/api";
 import "./navbar.css";
 
 import {
@@ -7,9 +8,10 @@ import {
   X,
   Settings,
   LogOut,
+  Upload,
 } from "lucide-react";
 
-const Navbar = () => {
+const Navbar = ({ user, onOpenCargar }) => {
   const [open, setOpen] = useState(false);
 
   const [showNavbar, setShowNavbar] = useState(true);
@@ -50,6 +52,14 @@ const Navbar = () => {
       );
   }, [lastScroll]);
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
+
   return (
     <>
       <nav
@@ -57,20 +67,40 @@ const Navbar = () => {
           showNavbar ? "show" : "hide"
         }`}
       >
-        {/* LEFT */}
+        {/* LEFT - LOGO */}
         <div className="navbar-logo">
-          Hola
+          MiAlbum
         </div>
 
-        {/* DESKTOP MENU */}
+        {/* CENTER - DESKTOP MENU */}
         <div className="navbar-links">
+
+          {/* PROFILE - LEFT */}
+          <div className="navbar-profile">
+            <div className="navbar-info">
+              <span className="navbar-greeting">Hola</span>
+              <span className="navbar-name">{user.displayName?.split(" ")[0]}</span>
+            </div>
+            <img
+              src={user.photoURL}
+              alt="Foto de perfil"
+              className="navbar-avatar"
+            />
+          </div>
+
+          {user.rol === "admin" && (
+            <button className="nav-btn upload-btn" onClick={onOpenCargar}>
+              <Upload size={18} />
+              Cargar Mundial
+            </button>
+          )}
 
           <button className="nav-btn">
             <Settings size={18} />
             Ajustes
           </button>
 
-          <button className="nav-btn logout">
+          <button className="nav-btn logout" onClick={handleLogout}>
             <LogOut size={18} />
             Cerrar sesión
           </button>
@@ -97,8 +127,6 @@ const Navbar = () => {
 
         <div className="mobile-header">
 
-          <h2>Menú</h2>
-
           <button
             className="close-btn"
             onClick={() => setOpen(false)}
@@ -108,14 +136,37 @@ const Navbar = () => {
 
         </div>
 
+        {/* MOBILE PROFILE */}
+        <div className="mobile-profile">
+          <img
+            src={user.photoURL}
+            alt="Foto de perfil"
+            className="mobile-avatar"
+          />
+          <div className="mobile-profile-info">
+            <span className="mobile-greeting">Hola</span>
+            <span className="mobile-profile-name">{user.displayName}</span>
+          </div>
+        </div>
+
         <div className="mobile-links">
+
+          {user.rol === "admin" && (
+            <button className="mobile-link upload-btn" onClick={() => {
+              onOpenCargar();
+              setOpen(false);
+            }}>
+              <Upload size={20} />
+              Cargar Mundial
+            </button>
+          )}
 
           <button className="mobile-link">
             <Settings size={20} />
             Ajustes
           </button>
 
-          <button className="mobile-link logout">
+          <button className="mobile-link logout" onClick={handleLogout}>
             <LogOut size={20} />
             Cerrar sesión
           </button>
