@@ -20,6 +20,35 @@
   margin-top: 20px;
 }
 
+.search-container {
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: var(--bg-card);
+}
+
 .add-cards-btn {
   margin-left: auto;
   background: var(--button-bg);
@@ -210,6 +239,10 @@
 
   .contenido-header h1 {
     font-size: 1.7rem;
+  }
+
+  .search-input {
+    max-width: 100%;
   }
 
   .grupo-title {

@@ -165,97 +165,111 @@
 /* ================= GRID ================= */
 
 .cards-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(auto-fit, minmax(220px, 1fr));
-
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 /* ================= CARD ================= */
 
 .card-item {
   background: var(--bg-card);
-
   border: 1px solid var(--border-color);
-
   border-radius: 20px;
-
   overflow: hidden;
-
   transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px;
 }
 
 .card-item:hover {
-  transform: translateY(-5px);
-
+  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  border-color: var(--primary);
 }
 
 .card-item img {
-  width: 100%;
-
-  height: 260px;
-
+  width: 140px;
+  height: 140px;
   object-fit: cover;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.card-item.gift-mode img.card-img-gift {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
 }
 
 .card-content {
-  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+}
+
+.card-info {
+  flex: 1;
 }
 
 .card-content span {
   color: var(--primary);
-
   font-size: 0.9rem;
-
   font-weight: 700;
+  display: block;
+  margin-bottom: 4px;
 }
 
 .card-content h4 {
   color: var(--text-primary);
-
-  margin: 10px 0 18px;
-
+  margin: 0;
   line-height: 1.4;
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+}
+
+.card-content p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
 }
 
 /* ================= BUTTON ================= */
 
-.card-content button {
-  width: 100%;
-
+.card-item button {
   height: 48px;
-
+  padding: 0 20px;
   border: none;
-
   border-radius: 14px;
-
   background: var(--primary);
-
   color: white;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   gap: 8px;
-
   font-size: 0.95rem;
   font-weight: 600;
-
   cursor: pointer;
-
   transition: var(--transition);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-.card-content button:hover {
+.card-item button:hover:not(:disabled) {
   background: var(--primary-hover);
+  transform: translateY(-2px);
 }
 
-.gift-btn {
+.card-item .gift-btn {
   background: var(--success) !important;
+}
+
+.card-item .gift-btn:hover:not(:disabled) {
+  background: #00c853 !important;
 }
 
 .selected-list {
@@ -313,12 +327,28 @@ button:disabled {
     flex-direction: column;
   }
 
-  .cards-grid {
-    grid-template-columns: 1fr;
+  .card-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
   }
 
   .card-item img {
-    height: 220px;
+    width: 120px;
+    height: 120px;
+  }
+
+  .card-content {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .card-info {
+    width: 100%;
+  }
+
+  .card-item button {
+    width: 100%;
   }
 }
 .open-input{

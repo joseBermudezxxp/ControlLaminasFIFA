@@ -151,6 +151,7 @@ const SwitchCards = ({
       alert(isGiftMode ? "🎁 Láminas regaladas" : "🔥 Guardado en tu álbum");
 
       setSelected({});
+      setInput("");
     } catch (err) {
       console.error("Error guardando:", err);
     }
@@ -201,44 +202,65 @@ const SwitchCards = ({
           </p>
         </div>
 
-        {/* INPUT */}
-        <input
-          className="open-input"
-          placeholder="ABC12"
-          value={input}
-          onChange={handleInput}
-        />
+        {/* INPUT - Solo en modo "abrir" */}
+        {!isGiftMode && (
+          <input
+            className="open-input"
+            placeholder="ABC12"
+            value={input}
+            onChange={handleInput}
+          />
+        )}
 
         {/* RESULTADOS */}
         <div className="cards-grid">
-          {results.map((lamina) => (
+          {(isGiftMode
+            ? laminas.filter((lamina) => (ownedCounts[lamina.id] || 0) >= 2)
+            : results
+          )
+            .filter((lamina) => {
+              // En modo regalar, mostrar solo láminas con cantidad >= 2
+              if (isGiftMode) {
+                return (ownedCounts[lamina.id] || 0) >= 2;
+              }
+              return true;
+            })
+            .map((lamina) => (
             <div
               key={lamina.id}
               className={`card-item ${
                 foundAnimation === lamina.id ? "found" : ""
-              }`}
+              } ${isGiftMode ? "gift-mode" : ""}`}
             >
-              <img src={lamina?.bandera || ""} />
+              {!isGiftMode && (
+                <img src={lamina?.bandera || ""} />
+              )}
 
               <div className="card-content">
-                <span>#{lamina?.numero}</span>
-                <h4>{lamina?.nombre}</h4>
-
                 {isGiftMode && (
-                  <p style={{ marginBottom: 12, color: "var(--text-secondary)", fontSize: "0.9rem" }}>
-                    Disponibles: {ownedCounts[lamina.id] || 0}
-                  </p>
+                  <img src={lamina?.bandera || ""} className="card-img-gift" />
                 )}
+                
+                <div className="card-info">
+                  <span>#{lamina?.numero}</span>
+                  <h4>{lamina?.nombre}</h4>
 
-                <button
-                  className={isGiftMode ? "gift-btn" : ""}
-                  onClick={() => handleSelect(lamina)}
-                  disabled={isGiftMode && (ownedCounts[lamina.id] || 0) === 0}
-                >
-                  <Check size={16} />
-                  {isGiftMode ? "Regalar" : "Guardar"}
-                </button>
+                  {isGiftMode && (
+                    <p style={{ marginTop: 6, color: "var(--text-secondary)", fontSize: "0.85rem" }}>
+                      Disponibles: <strong>{ownedCounts[lamina.id] || 0}</strong>
+                    </p>
+                  )}
+                </div>
               </div>
+
+              <button
+                className={isGiftMode ? "gift-btn" : ""}
+                onClick={() => handleSelect(lamina)}
+                disabled={isGiftMode && (ownedCounts[lamina.id] || 0) === 0}
+              >
+                <Check size={16} />
+                {isGiftMode ? "Regalar" : "Guardar"}
+              </button>
             </div>
           ))}
         </div>

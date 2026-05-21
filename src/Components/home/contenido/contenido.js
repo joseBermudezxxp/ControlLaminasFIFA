@@ -49,6 +49,7 @@ const Contenido = ({
   });
 
   const [switchOpen, setSwitchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
 
@@ -367,6 +368,17 @@ const Contenido = ({
 
       </div>
 
+      {/* SEARCH INPUT */}
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Buscar por país..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
+          className="search-input"
+        />
+      </div>
+
       {switchOpen && (
         <SwitchCards
           onClose={() => setSwitchOpen(false)}
@@ -380,9 +392,21 @@ const Contenido = ({
         grupos
       ).map((grupo) => {
 
-  const isOpen =
-    selectedGroup ===
-    grupo;
+  // Filtrar equipos dentro del grupo
+  const equiposFiltrados = Object.keys(
+    grupos[grupo]
+  ).filter((equipo) => {
+    if (!searchTerm) return true;
+    return equipo.toLowerCase().includes(searchTerm);
+  });
+
+  // Si no hay equipos que coincidan, no mostrar el grupo
+  if (searchTerm && equiposFiltrados.length === 0) {
+    return null;
+  }
+
+  // Si hay búsqueda, abrir automáticamente; si no, usar selectedGroup
+  const isOpen = searchTerm ? true : selectedGroup === grupo;
 
   return (
 
@@ -452,9 +476,7 @@ const Contenido = ({
 
         <div className="grupo-content">
 
-          {Object.keys(
-            grupos[grupo]
-          ).map((equipo) => (
+          {equiposFiltrados.map((equipo) => (
 
             <div
               key={equipo}
