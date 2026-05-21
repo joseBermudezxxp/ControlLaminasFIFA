@@ -1,0 +1,341 @@
+/* adquiriralbum.css */
+
+.adquirir-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: var(--overlay);
+  backdrop-filter: blur(6px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition: var(--transition);
+
+  z-index: 9999;
+}
+
+.adquirir-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.adquirir-container {
+  width: 95%;
+  max-width: 1200px;
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+
+  border: 1px solid var(--border-color);
+
+  border-radius: 28px;
+
+  padding: 2rem;
+
+  box-shadow: var(--shadow-lg);
+
+  animation: modalShow 0.25s ease;
+}
+
+@keyframes modalShow {
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ================= HEADER ================= */
+
+.adquirir-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 2rem;
+}
+
+.adquirir-header h1 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.close-btn {
+  width: 42px;
+  height: 42px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: var(--bg-secondary);
+
+  color: var(--text-primary);
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: var(--transition);
+}
+
+.close-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* ================= GRID ================= */
+
+.album-grid {
+  display: grid;
+
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(240px, 1fr)
+  );
+
+  gap: 1.5rem;
+}
+
+/* ================= CARD ================= */
+
+.album-card {
+  background: var(--bg-card-solid);
+
+  border: 1px solid var(--border-color);
+
+  border-radius: 24px;
+
+  overflow: hidden;
+
+  cursor: pointer;
+
+  transition: var(--transition);
+
+  box-shadow: var(--shadow-sm);
+}
+
+.album-card:hover {
+  transform: translateY(-6px);
+
+  box-shadow: var(--shadow-md);
+
+  border-color: var(--primary);
+}
+
+.album-image {
+  width: 100%;
+  height: 320px;
+
+  object-fit: cover;
+}
+
+.album-content {
+  padding: 1rem;
+}
+
+.album-content h3 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.album-content p {
+  margin-top: 0.5rem;
+
+  color: var(--text-muted);
+
+  font-size: 0.95rem;
+}
+
+/* ================= DETAIL ================= */
+
+.album-detail {
+  display: grid;
+
+  grid-template-columns: 380px 1fr;
+
+  gap: 2rem;
+
+  align-items: center;
+}
+
+.album-detail-image {
+  width: 100%;
+
+  border-radius: 24px;
+
+  object-fit: cover;
+
+  box-shadow: var(--shadow-md);
+}
+
+.album-detail-info h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+
+  color: var(--text-primary);
+
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.album-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+
+  margin-bottom: 1rem;
+
+  color: var(--text-secondary);
+
+  font-size: 1rem;
+}
+
+.album-info-item svg {
+  color: var(--primary);
+}
+
+/* ================= BUTTONS ================= */
+
+.album-buy-btn {
+  margin-top: 1.5rem;
+
+  border: none;
+
+  background: var(--button-bg);
+  color: var(--button-text);
+
+  padding: 1rem 1.5rem;
+
+  border-radius: 16px;
+
+  font-size: 1rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: var(--transition);
+
+  box-shadow: var(--shadow-sm);
+}
+
+.album-buy-btn:hover {
+  background: var(--primary-hover);
+
+  transform: translateY(-2px);
+}
+
+.album-back-btn {
+  margin-left: 1rem;
+
+  border: none;
+
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+
+  padding: 1rem 1.5rem;
+
+  border-radius: 16px;
+
+  font-size: 1rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: var(--transition);
+}
+
+.album-back-btn:hover {
+  opacity: 0.9;
+}
+
+/* ================= LOADING ================= */
+
+.loading {
+  text-align: center;
+
+  padding: 3rem;
+
+  color: var(--text-secondary);
+
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* ================= SCROLL ================= */
+
+.adquirir-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.adquirir-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.adquirir-container::-webkit-scrollbar-thumb {
+  background: var(--bg-secondary);
+
+  border-radius: 999px;
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 768px) {
+
+  .adquirir-container {
+    width: 96%;
+
+    padding: 1.2rem;
+
+    border-radius: 22px;
+  }
+
+  .adquirir-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .album-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .album-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .album-detail-image {
+    max-height: 420px;
+  }
+
+  .album-detail-info h2 {
+    font-size: 1.5rem;
+  }
+
+  .album-buy-btn,
+  .album-back-btn {
+    width: 100%;
+
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+}

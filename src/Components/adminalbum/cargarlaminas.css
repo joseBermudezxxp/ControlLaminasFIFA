@@ -1,0 +1,367 @@
+/* ================= OVERLAY ================= */
+
+.cargar-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: var(--overlay);
+
+  backdrop-filter: blur(8px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition: var(--transition);
+
+  z-index: 9999;
+}
+
+.cargar-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ================= CONTAINER ================= */
+
+.cargar-container {
+  width: 95%;
+  max-width: 1300px;
+
+  height: 92vh;
+
+  overflow-y: auto;
+
+  background: var(--bg-card);
+
+  border: 1px solid var(--border-color);
+
+  border-radius: 28px;
+
+  padding: 2rem;
+
+  box-shadow: var(--shadow-lg);
+
+  animation: modalShow 0.25s ease;
+}
+
+@keyframes modalShow {
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ================= HEADER ================= */
+
+.cargar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 2rem;
+}
+
+.cargar-header h1 {
+  margin: 0;
+
+  font-size: 2rem;
+
+  color: var(--text-primary);
+
+  font-weight: 800;
+}
+
+/* ================= CLOSE ================= */
+
+.close-btn {
+  width: 42px;
+  height: 42px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: var(--bg-secondary);
+
+  color: var(--text-primary);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: var(--transition);
+}
+
+.close-btn:hover {
+  background: var(--danger);
+
+  color: white;
+}
+
+/* ================= SELECT ================= */
+
+.cargar-container select {
+  width: 100%;
+
+  padding: 15px;
+
+  border-radius: 14px;
+
+  border: 1px solid var(--input-border);
+
+  background: var(--input-bg);
+
+  color: var(--text-primary);
+
+  font-size: 1rem;
+
+  outline: none;
+
+  margin-bottom: 1rem;
+}
+
+/* ================= EXCEL BUTTON ================= */
+
+.excel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 16px;
+
+  border-radius: 16px;
+
+  background: var(--secondary);
+
+  color: white;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: var(--transition);
+
+  margin-bottom: 2rem;
+}
+
+.excel-btn:hover {
+  background: var(--secondary-hover);
+}
+
+/* ================= PREVIEW ================= */
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 1.5rem;
+}
+
+.preview-header h2 {
+  margin: 0;
+
+  color: var(--text-primary);
+}
+
+.preview-header span {
+  color: var(--text-secondary);
+
+  font-weight: 600;
+}
+
+/* ================= GRID ================= */
+
+.preview-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(280px, 1fr)
+    );
+
+  gap: 1.5rem;
+}
+
+/* ================= CARD ================= */
+
+.preview-card {
+  background: var(--bg-card-solid);
+
+  border: 1px solid var(--border-color);
+
+  border-radius: 22px;
+
+  padding: 1.2rem;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+
+  box-shadow: var(--shadow-sm);
+
+  transition: var(--transition);
+}
+
+.preview-card:hover {
+  transform: translateY(-4px);
+
+  box-shadow: var(--shadow-md);
+}
+
+/* ================= INPUT ID ================= */
+
+.lamina-id-input {
+  width: 100%;
+
+  padding: 12px;
+
+  border-radius: 12px;
+
+  border: 1px solid var(--input-border);
+
+  background: var(--bg-input);
+
+  color: var(--primary);
+
+  font-size: 1.1rem;
+
+  font-weight: 800;
+
+  text-align: center;
+
+  outline: none;
+
+  transition: var(--transition);
+}
+
+.lamina-id-input:focus {
+  border-color: var(--primary);
+
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* ================= INPUTS ================= */
+
+.preview-card input {
+  width: 100%;
+
+  padding: 12px;
+
+  border-radius: 12px;
+
+  border: 1px solid var(--input-border);
+
+  background: var(--bg-input);
+
+  color: var(--text-primary);
+
+  outline: none;
+
+  transition: var(--transition);
+
+  box-sizing: border-box;
+}
+
+.preview-card input:focus {
+  border-color: var(--primary);
+
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* ================= SAVE BUTTON ================= */
+
+.save-btn {
+  margin-top: 2rem;
+
+  width: 100%;
+
+  border: none;
+
+  padding: 18px;
+
+  border-radius: 18px;
+
+  background: var(--primary);
+
+  color: white;
+
+  font-size: 1rem;
+
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  cursor: pointer;
+
+  transition: var(--transition);
+}
+
+.save-btn:hover {
+  background: var(--primary-hover);
+
+  transform: translateY(-2px);
+}
+
+.save-btn:disabled {
+  opacity: 0.7;
+
+  cursor: not-allowed;
+}
+
+/* ================= SCROLL ================= */
+
+.cargar-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.cargar-container::-webkit-scrollbar-thumb {
+  background: var(--bg-secondary);
+
+  border-radius: 999px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+
+  .cargar-container {
+    width: 96%;
+
+    padding: 1rem;
+
+    border-radius: 20px;
+  }
+
+  .preview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 10px;
+  }
+
+  .cargar-header h1 {
+    font-size: 1.5rem;
+  }
+}

@@ -1,53 +1,184 @@
-import React, { useState, useEffect } from "react";
+// home.js
+
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
 import "./home.css";
 
-import { auth, db } from "../../server/api";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  db,
+} from "../../server/api";
+
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+
+import {
+  BookOpen,
+} from "lucide-react";
 
 const Home = ({ user }) => {
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
+
+  const [albums, setAlbums] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const docRef = doc(db, "usuarios", user.uid);
-        const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-          setUserData(docSnap.data());
-        }
+    const fetchAlbums = async () => {
+
+      try {
+
+        const albumsQuery = query(
+          collection(
+            db,
+            "album_usuario"
+          ),
+          where(
+            "idUsuario",
+            "==",
+            user.uid
+          )
+        );
+
+        const albumsSnap =
+          await getDocs(
+            albumsQuery
+          );
+
+        const albumsData =
+          albumsSnap.docs.map(
+            (docu) => ({
+              id: docu.id,
+              ...docu.data(),
+            })
+          );
+
+        setAlbums(albumsData);
+
       } catch (error) {
-        console.error("Error fetching user data:", error);
+
+        console.error(
+          "Error cargando álbumes:",
+          error
+        );
+
       } finally {
+
         setLoading(false);
+
       }
     };
 
-    fetchUserData();
+    fetchAlbums();
+
   }, [user.uid]);
 
+  // =========================
+  // LOADING
+  // =========================
+
   if (loading) {
-    return <div className="home-container"><h2>Cargando...</h2></div>;
+
+    return (
+      <div className="home-container">
+        <h2>Cargando...</h2>
+      </div>
+    );
   }
 
   return (
     <div className="home-container">
+
       <div className="home-content">
-        <div className="profile-section">
-          <img
-            src={user.photoURL}
-            alt="Foto de perfil"
-            className="profile-pic"
-          />
-          <h2>Hola, {userData?.nombre || user.displayName}! 👋</h2>
-          <p className="profile-email">{user.email}</p>
+
+        {/* TITLE */}
+        <div className="welcome-section">
+
+          <h1>
+            Mis Álbumes
+          </h1>
+
+          <p>
+            Tus álbumes mundialistas
+            adquiridos
+          </p>
+
         </div>
 
-        <div className="welcome-section">
-          <h1>World Cup Album</h1>
-          <p>Bienvenido a tu álbum mundialista</p>
-        </div>
+        {/* EMPTY */}
+        {albums.length === 0 ? (
+
+          <div className="empty-albums">
+
+            <BookOpen size={55} />
+
+            <h2>
+              No tienes álbumes
+            </h2>
+
+            <p>
+              Adquiere uno desde
+              el menú superior
+            </p>
+
+          </div>
+
+        ) : (
+
+          <div className="albums-grid">
+
+            {albums.map(
+              (album) => (
+
+                <div
+                  key={album.id}
+                  className="album-card"
+                >
+
+                  <img
+                    src={
+                      album.portadaAlbum
+                    }
+                    alt={
+                      album.nombreAlbum
+                    }
+                    className="album-image"
+                  />
+
+                  <div className="album-content">
+
+                    <h3>
+                      {
+                        album.nombreAlbum
+                      }
+                    </h3>
+
+                    <p>
+                      {
+                        album.numeroEstampitas
+                      }{" "}
+                      estampitas
+                    </p>
+
+                  </div>
+
+                </div>
+
+              )
+            )}
+
+          </div>
+
+        )}
+
       </div>
     </div>
   );

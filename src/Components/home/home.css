@@ -19,77 +19,29 @@
 /* ================= HOME CONTENT ================= */
 
 .home-content {
-  max-width: 800px;
-
   width: 100%;
+  max-width: 1300px;
 
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 40px;
 
+  gap: 40px;
+}
+
+/* ================= WELCOME ================= */
+
+.welcome-section {
   text-align: center;
 }
 
-/* ================= PROFILE SECTION ================= */
-
-.profile-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-
-  padding: 30px;
-
-  background: var(--bg-card);
-
-  border: 1px solid var(--border-color);
-
-  border-radius: 16px;
-}
-
-.profile-pic {
-  width: 100px;
-
-  height: 100px;
-
-  border-radius: 50%;
-
-  border: 3px solid var(--primary);
-
-  object-fit: cover;
-}
-
-.profile-section h2 {
-  font-size: 1.8rem;
-
-  margin: 0;
-
-  color: var(--text-primary);
-}
-
-.profile-email {
-  font-size: 0.95rem;
-
-  color: var(--text-secondary);
-
-  margin: 0;
-}
-
-/* ================= WELCOME SECTION ================= */
-
 .welcome-section h1 {
-  font-size: 2.5rem;
+  font-size: 2.8rem;
 
   margin: 0 0 10px 0;
 
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--text-primary);
 
-  -webkit-background-clip: text;
-
-  -webkit-text-fill-color: transparent;
-
-  background-clip: text;
+  font-weight: 800;
 }
 
 .welcome-section p {
@@ -100,11 +52,125 @@
   margin: 0;
 }
 
+/* ================= EMPTY ================= */
+
+.empty-albums {
+  width: 100%;
+
+  padding: 60px 20px;
+
+  border-radius: 24px;
+
+  background: var(--bg-card);
+
+  border: 1px solid var(--border-color);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 15px;
+
+  text-align: center;
+
+  box-shadow: var(--shadow-sm);
+}
+
+.empty-albums svg {
+  color: var(--primary);
+}
+
+.empty-albums h2 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 1.8rem;
+}
+
+.empty-albums p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-size: 1rem;
+}
+
+/* ================= GRID ================= */
+
+.albums-grid {
+  display: grid;
+
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(250px, 1fr)
+  );
+
+  gap: 28px;
+}
+
+/* ================= CARD ================= */
+
+.album-card {
+  background: var(--bg-card);
+
+  border: 1px solid var(--border-color);
+
+  border-radius: 24px;
+
+  overflow: hidden;
+
+  transition: var(--transition);
+
+  box-shadow: var(--shadow-sm);
+
+  cursor: pointer;
+}
+
+.album-card:hover {
+  transform: translateY(-8px);
+
+  box-shadow: var(--shadow-md);
+
+  border-color: var(--primary);
+}
+
+.album-image {
+  width: 100%;
+  height: 340px;
+
+  object-fit: cover;
+}
+
+.album-content {
+  padding: 18px;
+}
+
+.album-content h3 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 1.3rem;
+
+  font-weight: 700;
+}
+
+.album-content p {
+  margin-top: 8px;
+
+  color: var(--text-secondary);
+
+  font-size: 0.95rem;
+}
+
 /* ================= RESPONSIVE ================= */
 
 @media (max-width: 768px) {
+
   .home-container {
-    padding: 30px 15px;
+    padding: 25px 15px;
 
     margin-bottom: 120px;
   }
@@ -117,13 +183,16 @@
     font-size: 2rem;
   }
 
-  .profile-section h2 {
-    font-size: 1.5rem;
+  .albums-grid {
+    grid-template-columns: 1fr;
   }
 
-  .profile-pic {
-    width: 80px;
-
-    height: 80px;
+  .album-image {
+    height: 300px;
   }
+
+  .empty-albums {
+    padding: 40px 20px;
+  }
+
 }
