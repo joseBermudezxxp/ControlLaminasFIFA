@@ -1,25 +1,44 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Álbum Mundial",
+  "name": "Control de Álbum Mundial",
+  "description": "Aplicación para administrar y completar álbumes del Mundial de fútbol.",
+
   "icons": [
     {
       "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "sizes": "16x16 24x24 32x32 64x64",
       "type": "image/x-icon"
     },
     {
       "src": "logo192.png",
+      "sizes": "192x192",
       "type": "image/png",
-      "sizes": "192x192"
+      "purpose": "any maskable"
     },
     {
       "src": "logo512.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "sizes": "512x512"
+      "purpose": "any maskable"
     }
   ],
+
   "start_url": ".",
+  "scope": ".",
+
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "orientation": "portrait",
+
+  "theme_color": "#0f172a",
+  "background_color": "#0b1120",
+
+  "lang": "es",
+  "dir": "ltr",
+
+  "categories": [
+    "sports",
+    "games",
+    "entertainment",
+    "utilities"
+  ]
 }
