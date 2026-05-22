@@ -21,8 +21,47 @@
 }
 
 .search-container {
-  margin-bottom: 30px;
+  margin-bottom: 18px;
   width: 100%;
+}
+
+.view-mode-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.mode-filter {
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  padding: 10px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: var(--transition);
+}
+
+.mode-filter:hover,
+.mode-filter.active {
+  border-color: var(--primary);
+  background: var(--primary-hover);
+  color: var(--button-text);
+}
+
+.lamina-count-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  min-width: 28px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(0, 176, 255, 0.95);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-align: center;
 }
 
 .search-input {
@@ -54,11 +93,12 @@
   background: var(--button-bg);
   color: var(--button-text);
   border: none;
-  padding: 10px 14px;
-  border-radius: 12px;
+  padding: 14px 22px;
+  border-radius: 16px;
   cursor: pointer;
-  font-weight: 700;
-  box-shadow: var(--shadow-sm);
+  font-weight: 800;
+  font-size: 1rem;
+  box-shadow: var(--shadow-md);
 }
 
 .add-cards-btn:hover {
@@ -156,6 +196,7 @@
 ========================= */
 
 .lamina-card {
+  position: relative;
   background: var(--bg-card);
 
   backdrop-filter: blur(6px);
@@ -175,6 +216,62 @@
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
   border-color: var(--primary);
+}
+
+.lamina-card::after {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  right: 12px;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 0.72rem;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.lamina-card:hover::after {
+  opacity: 1;
+}
+
+.lamina-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.lamina-card.selected {
+  border: 2px dashed var(--primary);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.guardar-button {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 50;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 14px 22px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.guardar-button:hover {
+  transform: translateY(-2px);
+}
+
+.guardar-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .lamina-image {
@@ -292,6 +389,36 @@
   transition: var(--transition);
 
   box-shadow: var(--shadow-sm);
+}
+
+.grupo-header.complete {
+  border-color: var(--success);
+  background: rgba(22, 163, 74, 0.12);
+}
+
+.grupo-header.complete .grupo-title,
+.grupo-header.complete .grupo-progress {
+  color: var(--success);
+}
+
+.grupo-progress-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.grupo-bar {
+  width: 120px;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+
+.grupo-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  transition: width 0.25s ease;
 }
 
 .grupo-header:hover {

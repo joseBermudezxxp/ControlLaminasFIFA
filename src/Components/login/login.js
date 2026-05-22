@@ -5,6 +5,8 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 import { auth, db } from "../../server/api";
+import Carga from "../../Resources/carga/carga";
+import { showToast } from "../../Resources/toast/ToastContainer";
 
 const provider = new GoogleAuthProvider();
 
@@ -14,6 +16,9 @@ const Login = () => {
   const loginGoogle = async () => {
     try {
       setLoading(true);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("wc-loader", { detail: { visible: true } }));
+      }
 
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
@@ -38,16 +43,26 @@ const Login = () => {
         },
         { merge: true }
       );
+      setLoading(false);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("wc-loader", { detail: { visible: false } }));
+      }
     } catch (error) {
       console.error(error);
-      alert("Error al iniciar sesión");
+      showToast("Error al iniciar sesión", "error");
       setLoading(false);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("wc-loader", { detail: { visible: false } }));
+      }
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
+    <>
+      <Carga visible={loading} />
+
+      <div className="login-container">
+        <div className="login-card">
         <h1>World Cup Album</h1>
 
         <p>Inicia sesión con Google</p>
@@ -59,8 +74,9 @@ const Login = () => {
           />
           Continuar con Google
         </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

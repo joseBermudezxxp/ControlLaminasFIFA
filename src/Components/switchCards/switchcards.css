@@ -180,6 +180,7 @@
   overflow: hidden;
   transition: var(--transition);
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 18px;
   padding: 16px;
@@ -300,6 +301,9 @@
   cursor: pointer;
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
+  position: sticky;
+  bottom: 20px;
+  z-index: 10;
 }
 
 .open-pack-btn:hover {
@@ -315,41 +319,29 @@ button:disabled {
 
 @media (max-width: 768px) {
 
-  .switch-modal {
-    padding: 25px 18px;
-  }
-
-  .switch-header h2 {
-    font-size: 1.6rem;
-  }
-
   .switch-modes {
     flex-direction: column;
+    gap: 18px;
   }
 
-  .card-item {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
+  .mode-btn {
+    min-height: 90px;
+
+    padding: 20px;
+
+    font-size: 1.2rem;
+    font-weight: 700;
+
+    border-radius: 20px;
+
+    gap: 14px;
   }
 
-  .card-item img {
-    width: 120px;
-    height: 120px;
+  .mode-btn svg {
+    width: 24px;
+    height: 24px;
   }
 
-  .card-content {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .card-info {
-    width: 100%;
-  }
-
-  .card-item button {
-    width: 100%;
-  }
 }
 .open-input{
   width:100%;
@@ -434,6 +426,16 @@ button:disabled {
 .open-pack-btn:hover {
   background: var(--primary-hover);
   transform: translateY(-2px);
+}
+
+.no-duplicates-message {
+  padding: 20px;
+  border-radius: 18px;
+  text-align: center;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  font-weight: 600;
 }
 
 /* ================= RESULTADOS ================= */

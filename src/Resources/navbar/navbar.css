@@ -12,9 +12,13 @@
 
   padding: 0 30px;
 
-  background: var(--bg-card);
+  background: var(--bg-cards);
 
-  backdrop-filter: blur(12px);
+  /* ✅ color sólido completo */
+  opacity: 1;
+
+  /* ✅ elimina transparencia visual */
+  backdrop-filter: none;
 
   border-bottom: 1px solid var(--border-color);
 

@@ -13,6 +13,7 @@ import {
   collection,
   getDocs,
   doc,
+  getDoc,
   updateDoc,
 } from "firebase/firestore";
 
@@ -47,6 +48,9 @@ const CargarLaminas = ({
   const [preview, setPreview] =
     useState([]);
 
+  const [currentLaminas, setCurrentLaminas] = useState([]);
+  const [hasExistingLaminas, setHasExistingLaminas] = useState(false);
+
   // =========================
   // LOAD WORLDCUPS
   // =========================
@@ -58,6 +62,44 @@ const CargarLaminas = ({
     }
 
   }, [isOpen]);
+
+  useEffect(() => {
+    const loadExistingLaminas = async () => {
+      if (!idMundial) {
+        setCurrentLaminas([]);
+        setHasExistingLaminas(false);
+        setPreview([]);
+        return;
+      }
+
+      try {
+        const mundialRef = doc(db, "mundial", idMundial);
+        const mundialSnap = await getDoc(mundialRef);
+
+        if (mundialSnap.exists()) {
+          const laminasMap = mundialSnap.data()?.laminas || {};
+          const laminasArray = Object.values(laminasMap).map((lamina) => ({
+            ...lamina,
+            id: lamina.id || `${lamina.abreviacion || ""}${lamina.numero || ""}`,
+          }));
+
+          setCurrentLaminas(laminasArray);
+          setHasExistingLaminas(Object.keys(laminasMap).length > 0);
+          setPreview(laminasArray);
+        } else {
+          setCurrentLaminas([]);
+          setHasExistingLaminas(false);
+          setPreview([]);
+        }
+      } catch (error) {
+        console.error("Error cargando láminas existentes:", error);
+        setCurrentLaminas([]);
+        setHasExistingLaminas(false);
+      }
+    };
+
+    loadExistingLaminas();
+  }, [idMundial]);
 
   const cargarMundiales = async () => {
 
@@ -178,48 +220,54 @@ const CargarLaminas = ({
             .replace("(", "")
             .replace(")", "");
 
-        const [
-          inicio,
-          fin,
-        ] =
-          rangoTexto
-            .split("-")
-            .map(Number);
+        const numeroRow = Number(row["NUMERO"] || row["numero"] || 0);
 
-        // =====================
-        // GENERAR LÁMINAS
-        // =====================
+        if (rangoTexto) {
+          const [
+            inicio,
+            fin,
+          ] =
+            rangoTexto
+              .split("-")
+              .map(Number);
 
-        for (
-          let i = inicio;
-          i <= fin;
-          i++
-        ) {
+          // =====================
+          // GENERAR LÁMINAS
+          // =====================
 
+          for (
+            let i = inicio;
+            i <= fin;
+            i++
+          ) {
+
+            todas.push({
+              id:
+                `${abreviacion}${i}`,
+              numero: i,
+              nombre,
+              abreviacion,
+              grupo,
+              bandera,
+              tipo,
+              jugador: "",
+              idMundial,
+              editable: true,
+            });
+          }
+        } else if (numeroRow > 0) {
           todas.push({
-
-            // MEX1
-            // FWC9
-
-            id:
-              `${abreviacion}${i}`,
-
-            numero: i,
-
+            id: row["ID"]
+              ? row["ID"].toString().toUpperCase().trim()
+              : `${abreviacion}${numeroRow}`,
+            numero: numeroRow,
             nombre,
-
             abreviacion,
-
             grupo,
-
             bandera,
-
             tipo,
-
-            jugador: "",
-
+            jugador: row["JUGADOR"] || "",
             idMundial,
-
             editable: true,
           });
         }
@@ -457,22 +505,44 @@ const CargarLaminas = ({
         </select>
 
         {/* FILE */}
-        <label className="excel-btn">
+        <div className="excel-actions">
+          <label className="excel-btn">
+            <Upload size={18} />
+            Importar Excel
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              hidden
+              onChange={leerExcel}
+            />
+          </label>
 
-          <Upload size={18} />
-
-          Seleccionar Excel
-
-          <input
-            type="file"
-            accept=".xlsx,.xls"
-            hidden
-            onChange={
-              leerExcel
-            }
-          />
-
-        </label>
+          {hasExistingLaminas && (
+            <button
+              type="button"
+              className="excel-btn export-btn"
+              onClick={() => {
+                const rows = currentLaminas.map((item) => ({
+                  "ID": item.id,
+                  "NOMBRE DEL EQUIPO": item.nombre,
+                  "ABREVIACION": item.abreviacion,
+                  "GRUPO": item.grupo,
+                  "URL BANDERA": item.bandera,
+                  "TIPO": item.tipo,
+                  "NUMERO": item.numero,
+                  "JUGADOR": item.jugador || "",
+                }));
+                const worksheet = XLSX.utils.json_to_sheet(rows);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Láminas");
+                XLSX.writeFile(workbook, `${idMundial}_laminas.xlsx`);
+              }}
+            >
+              <Upload size={18} />
+              Exportar Excel
+            </button>
+          )}
+        </div>
 
         {/* PREVIEW */}
         {preview.length > 0 && (

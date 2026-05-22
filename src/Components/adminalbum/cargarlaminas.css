@@ -133,8 +133,15 @@
 
 /* ================= EXCEL BUTTON ================= */
 
-.excel-btn {
+.excel-actions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+
+.excel-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
@@ -153,11 +160,19 @@
 
   transition: var(--transition);
 
-  margin-bottom: 2rem;
+  border: none;
+}
+
+.export-btn {
+  background: var(--primary);
 }
 
 .excel-btn:hover {
   background: var(--secondary-hover);
+}
+
+.export-btn:hover {
+  background: var(--primary-hover);
 }
 
 /* ================= PREVIEW ================= */

@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 
 import { auth, db } from "../../../server/api";
+import { showToast } from "../../../Resources/toast/ToastContainer";
 
 import {
   X,
@@ -20,6 +21,7 @@ import {
 const AdquirirAlbum = ({
   isOpen,
   onClose,
+  onAlbumAcquired,
 }) => {
 
   const [mundiales, setMundiales] =
@@ -73,8 +75,9 @@ const AdquirirAlbum = ({
 
       console.error(error);
 
-      alert(
-        "Error cargando álbumes"
+      showToast(
+        "Error cargando álbumes",
+        "error"
       );
 
     } finally {
@@ -99,8 +102,9 @@ const AdquirirAlbum = ({
 
       if (!user) {
 
-        alert(
-          "Debes iniciar sesión"
+        showToast(
+          "Debes iniciar sesión",
+          "error"
         );
 
         return;
@@ -139,9 +143,14 @@ const AdquirirAlbum = ({
         }
       );
 
-      alert(
-        `Has adquirido el álbum ${selectedAlbum.nombre}`
+      showToast(
+        `Has adquirido el álbum ${selectedAlbum.nombre}`,
+        "success"
       );
+
+      if (typeof onAlbumAcquired === "function") {
+        onAlbumAcquired();
+      }
 
       onClose();
 
@@ -149,8 +158,9 @@ const AdquirirAlbum = ({
 
       console.error(error);
 
-      alert(
-        "Error al adquirir álbum"
+      showToast(
+        "Error al adquirir álbum",
+        "error"
       );
 
     } finally {

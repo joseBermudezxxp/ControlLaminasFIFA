@@ -48,7 +48,6 @@ export default function Carga({ visible = true, onHidden, minDuration = 2800 }) 
   const [labelIdx, setLabelIdx] = useState(0);
   const [gone,     setGone]     = useState(false);   // desmonta el nodo tras la transición
   const startTime = useRef(Date.now());
-  const hiding    = !visible;                         // clase CSS se aplica cuando visible=false
 
   // Rotación de etiquetas
   useEffect(() => {
@@ -57,6 +56,12 @@ export default function Carga({ visible = true, onHidden, minDuration = 2800 }) 
     }, 620);
     return () => clearInterval(id);
   }, []);
+  useEffect(() => {
+  if (visible) {
+    setGone(false);
+    startTime.current = Date.now();
+  }
+}, [visible]);
 
   // Cuando visible pasa a false, esperamos minDuration antes de añadir la clase de salida
   const [readyToHide, setReadyToHide] = useState(false);

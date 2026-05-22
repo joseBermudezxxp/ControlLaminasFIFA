@@ -4,56 +4,61 @@ import React, { useEffect, useState } from "react";
 
 import "./home.css";
 import { BookOpen } from "lucide-react";
-import { auth } from "../../server/api";
+import { auth, db } from "../../server/api";
+import { doc, onSnapshot } from "firebase/firestore";
 
 const Home = ({ user, albums = [], onSelectAlbum }) => {
   const [albumStats, setAlbumStats] = useState({});
 
   useEffect(() => {
-    const loadAlbumStats = async () => {
-      if (!albums.length || !auth.currentUser?.uid) return;
+    if (!albums.length || !auth.currentUser?.uid) {
+      setAlbumStats({});
+      return;
+    }
 
-      const { doc, getDoc } = await import("firebase/firestore");
-      const { db } = await import("../../server/api");
-      const userId = auth.currentUser.uid;
+    const userId = auth.currentUser.uid;
+    const unsubscribes = [];
 
-      const stats = {};
-
-      for (const album of albums) {
-        try {
-          const ref = doc(db, "album_usuario", `${userId}_${album.idMundial}`);
-          const snap = await getDoc(ref);
-
-          if (snap.exists()) {
-            const data = snap.data();
-            const laminas = data?.laminas || {};
-            const collectedCount = Object.values(laminas).reduce(
-              (sum, qty) => sum + (Number(qty) > 0 ? 1 : 0),
-              0
-            );
-            stats[album.id] = {
-              collected: collectedCount,
-              total: album.numeroEstampitas,
-            };
-          } else {
-            stats[album.id] = {
-              collected: 0,
-              total: album.numeroEstampitas,
-            };
+    for (const album of albums) {
+      try {
+        const ref = doc(db, "album_usuario", `${userId}_${album.idMundial}`);
+        const unsub = onSnapshot(
+          ref,
+          (snap) => {
+            if (snap.exists()) {
+              const data = snap.data();
+              const laminas = data?.laminas || {};
+              const collectedCount = Object.values(laminas).reduce(
+                (sum, qty) => sum + (Number(qty) > 0 ? 1 : 0),
+                0
+              );
+              setAlbumStats((prev) => ({
+                ...prev,
+                [album.id]: { collected: collectedCount, total: album.numeroEstampitas },
+              }));
+            } else {
+              setAlbumStats((prev) => ({
+                ...prev,
+                [album.id]: { collected: 0, total: album.numeroEstampitas },
+              }));
+            }
+          },
+          (error) => {
+            console.error("Error en snapshot de stats del álbum:", error);
           }
-        } catch (error) {
-          console.error("Error cargando stats del álbum:", error);
-          stats[album.id] = {
-            collected: 0,
-            total: album.numeroEstampitas,
-          };
-        }
+        );
+
+        unsubscribes.push(unsub);
+      } catch (error) {
+        console.error("Error iniciando listener de stats del álbum:", error);
+        setAlbumStats((prev) => ({
+          ...prev,
+          [album.id]: { collected: 0, total: album.numeroEstampitas },
+        }));
       }
+    }
 
-      setAlbumStats(stats);
-    };
-
-    loadAlbumStats();
+    return () => unsubscribes.forEach((u) => u && u());
   }, [albums]);
 
   const getPercentage = (album) => {
