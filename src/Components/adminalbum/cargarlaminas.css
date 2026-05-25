@@ -167,12 +167,36 @@
   background: var(--primary);
 }
 
+.download-btn {
+  background: var(--primary);
+}
+
+.download-urls-btn {
+  background: var(--primary);
+}
+
+.update-urls-btn {
+  background: var(--success, #10b981);
+}
+
 .excel-btn:hover {
   background: var(--secondary-hover);
 }
 
 .export-btn:hover {
   background: var(--primary-hover);
+}
+
+.download-btn:hover {
+  background: var(--primary-hover);
+}
+
+.download-urls-btn:hover {
+  background: var(--primary-hover);
+}
+
+.update-urls-btn:hover {
+  background: var(--success-hover, #059669);
 }
 
 /* ================= PREVIEW ================= */
@@ -238,6 +262,59 @@
   box-shadow: var(--shadow-md);
 }
 
+/* ================= FLAG PREVIEW ================= */
+
+.flag-preview-container {
+  width: 100%;
+  height: 80px;
+
+  background: var(--bg-secondary);
+
+  border: 2px solid var(--border-color);
+
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  position: relative;
+}
+
+.flag-preview-img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  background: var(--bg-secondary);
+
+  transition: opacity 0.3s ease;
+}
+
+.flag-preview-error {
+  width: 100%;
+  height: 100%;
+
+  background: linear-gradient(135deg, var(--danger, #ef4444) 0%, rgba(239, 68, 68, 0.2) 100%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--danger, #ef4444);
+
+  font-size: 0.85rem;
+
+  font-weight: 600;
+
+  text-align: center;
+
+  padding: 10px;
+}
+
 /* ================= INPUT ID ================= */
 
 .lamina-id-input {
@@ -270,6 +347,31 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
+/* ================= ID DISPLAY ================= */
+
+.lamina-id-display {
+  margin: 0;
+  padding: 12px;
+  background: var(--bg-input);
+  border-radius: 12px;
+  color: var(--primary);
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* ================= NAME DISPLAY ================= */
+
+.lamina-name-display {
+  margin: 0;
+  padding: 12px;
+  background: var(--bg-input);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
 /* ================= INPUTS ================= */
 
 .preview-card input {
@@ -296,6 +398,17 @@
   border-color: var(--primary);
 
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* ================= URL INPUT ================= */
+
+.url-input {
+  font-size: 0.85rem !important;
+  font-family: 'Courier New', monospace !important;
+}
+
+.url-input::placeholder {
+  color: var(--text-secondary);
 }
 
 /* ================= SAVE BUTTON ================= */
