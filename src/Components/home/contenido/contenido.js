@@ -1,296 +1,379 @@
-// contenido.js
+// contenido.js — v3
 
 import React, {
   useEffect,
+  useRef,
   useState,
+  useCallback,
 } from "react";
 
 import "./contenido.css";
-
-import {
-  db,
-} from "../../../server/api";
+import { db } from "../../../server/api";
 
 import {
   doc,
   getDoc,
   onSnapshot,
   setDoc,
+  updateDoc,
+  deleteField,
 } from "firebase/firestore";
 
-import {
-  ArrowLeft,
-  ChevronDown,
-} from "lucide-react";
+import { ArrowLeft, ChevronDown } from "lucide-react";
 
 import SwitchCards from "../../switchCards/SwitchCards";
 import "../../../Resources/carga/carga.js";
 import { auth } from "../../../server/api";
 import { showToast } from "../../../Resources/toast/ToastContainer";
 
-const Contenido = ({
-  album,
-  onBack,
-}) => {
+// ─────────────────────────────────────────────
+// LONG-PRESS HOOK
+// ─────────────────────────────────────────────
+const LONG_PRESS_MS = 500;
 
-  const [laminas, setLaminas] =
-    useState([]);
+function useLongPress(onLongPress, onClick) {
+  const timerRef    = useRef(null);
+  const fired       = useRef(false);
 
-  const [loading, setLoading] =
-    useState(true);
+  const start = useCallback((e) => {
+    fired.current = false;
+    timerRef.current = setTimeout(() => {
+      fired.current = true;
+      onLongPress(e);
+    }, LONG_PRESS_MS);
+  }, [onLongPress]);
 
-  const [selectedGroup, setSelectedGroup] = useState(null);
-  const [viewMode, setViewMode] = useState("all");
-  const [ownedLaminas, setOwnedLaminas] = useState({});
-  const [selectedLaminas, setSelectedLaminas] = useState({});
+  const cancel = useCallback(() => {
+    clearTimeout(timerRef.current);
+  }, []);
+
+  const handleClick = useCallback((e) => {
+    if (fired.current) { fired.current = false; return; }
+    onClick(e);
+  }, [onClick]);
+
+  return {
+    onMouseDown:  start,
+    onMouseUp:    cancel,
+    onMouseLeave: cancel,
+    onTouchStart: (e) => { e.preventDefault(); start(e); },
+    onTouchEnd:   cancel,
+    onClick:      handleClick,
+  };
+}
+
+// ─────────────────────────────────────────────
+// MODAL DE EDICIÓN DE CANTIDAD
+// ─────────────────────────────────────────────
+function EditQtyModal({ lamina, initialQty, onConfirm, onClose }) {
+  // initialQty = la cantidad real en Firestore (ownedCount solamente)
+  const [qty, setQty] = useState(initialQty);
+  const [bumping, setBumping] = useState(false);
+
+  const bump = () => {
+    setBumping(true);
+    setTimeout(() => setBumping(false), 180);
+  };
+
+  const increment = () => { bump(); setQty((q) => q + 1); };
+  const decrement = () => { bump(); setQty((q) => Math.max(0, q - 1)); };
+
+  const isDelete = qty === 0;
+
+  return (
+    <div
+      className="edit-modal-overlay"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="edit-modal">
+        <div className="edit-modal-handle" />
+
+        <p className="edit-modal-title">{lamina.nombre}</p>
+        <p className="edit-modal-sub">
+          #{lamina.numero} · {lamina.id} · Editar cantidad en tu álbum
+        </p>
+
+        <div className="edit-qty-row">
+          <button
+            className={`edit-qty-btn${qty === 0 ? " danger" : ""}`}
+            onClick={decrement}
+            aria-label="Reducir"
+          >
+            −
+          </button>
+
+          <span className={`edit-qty-value${bumping ? " bump" : ""}`}>
+            {qty}
+          </span>
+
+          <button className="edit-qty-btn" onClick={increment} aria-label="Aumentar">
+            +
+          </button>
+        </div>
+
+        <div className="edit-modal-actions">
+          <button className="edit-modal-cancel" onClick={onClose}>
+            Cancelar
+          </button>
+          <button
+            className={`edit-modal-confirm${isDelete ? " delete-mode" : ""}`}
+            onClick={() => onConfirm(qty)}
+          >
+            {isDelete ? "🗑 Eliminar lámina" : `Guardar (${qty})`}
+          </button>
+        </div>
+
+        <p className="edit-hint">Pon 0 para eliminar la lámina de tu álbum</p>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// CARD DE LÁMINA
+// ─────────────────────────────────────────────
+function LaminaCard({ lamina, collected, selected, totalCount, onTap, onLongPress }) {
+  const [pressing, setPressing] = useState(false);
+  const pressTimer = useRef(null);
+
+  const handleLP = useCallback(() => {
+    setPressing(false);
+    onLongPress(lamina);
+  }, [lamina, onLongPress]);
+
+  const handleTap = useCallback(() => onTap(lamina.id), [lamina.id, onTap]);
+
+  const lp = useLongPress(handleLP, handleTap);
+
+  const onTS = (e) => {
+    setPressing(true);
+    lp.onTouchStart(e);
+    pressTimer.current = setTimeout(() => setPressing(false), LONG_PRESS_MS + 80);
+  };
+
+  const onTE = (e) => {
+    setPressing(false);
+    clearTimeout(pressTimer.current);
+    lp.onTouchEnd(e);
+  };
+
+  return (
+    <div
+      {...lp}
+      onTouchStart={onTS}
+      onTouchEnd={onTE}
+      className={[
+        "lamina-card",
+        collected ? "collected" : "",
+        selected  ? "selected"  : "",
+        pressing  ? "pressing"  : "",
+      ].filter(Boolean).join(" ")}
+    >
+      <img
+        src={lamina.bandera}
+        alt={lamina.nombre}
+        className={`lamina-image${collected ? " owned" : ""}`}
+        draggable={false}
+      />
+
+      <div className="lamina-info">
+        <h4>{lamina.nombre}</h4>
+        <p>
+          {String(lamina.id) === "00" ? (
+            <span style={{ fontWeight: 700, color: "var(--primary)" }}>#00</span>
+          ) : (
+            <>
+              <span>#{lamina.numero}</span>
+              <small style={{ color: "var(--text-muted)", fontWeight: 700 }}>
+                {lamina.id}
+              </small>
+            </>
+          )}
+        </p>
+      </div>
+
+      {/* Badge solo cuando hay duplicados (≥2) */}
+      {totalCount >= 2 && (
+        <div className="lamina-count-badge">{totalCount}</div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// COMPONENTE PRINCIPAL
+// ─────────────────────────────────────────────
+const Contenido = ({ album, onBack }) => {
+  const [laminas,         setLaminas]         = useState([]);
+  const [loading,         setLoading]         = useState(true);
+  const [selectedGroup,   setSelectedGroup]   = useState(null);
+  const [viewMode,        setViewMode]        = useState("all");
+  const [ownedLaminas,    setOwnedLaminas]    = useState({});   // Firestore real
+  const [pendingLaminas,  setPendingLaminas]  = useState({});   // selección local aún no guardada
   const [savingSelection, setSavingSelection] = useState(false);
+  const [switchOpen,      setSwitchOpen]      = useState(false);
+  const [searchTerm,      setSearchTerm]      = useState("");
+  const [editModal,       setEditModal]       = useState(null);
 
-  const [switchOpen, setSwitchOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  // ── Helpers ─────────────────────────────────
+  // Conteo confirmado en Firestore
+  const getOwned   = (id) => Number(ownedLaminas[id]  || 0);
+  // Conteo pendiente (taps sin guardar)
+  const getPending = (id) => Number(pendingLaminas[id] || 0);
+  // Total visual = owned + pending
+  const getTotal   = (lamina) => getOwned(lamina.id) + getPending(lamina.id);
 
-  const getOwnedCount = (laminaId) => Number(ownedLaminas[laminaId] || 0);
-  const getSelectedCount = (laminaId) => Number(selectedLaminas[laminaId] || 0);
-  const getTotalCount = (lamina) => getOwnedCount(lamina.id) + getSelectedCount(lamina.id);
-  const isSelected = (lamina) => getSelectedCount(lamina.id) > 0;
-  const isCollected = (lamina) => getOwnedCount(lamina.id) > 0 || getSelectedCount(lamina.id) > 0;
-  const isRepeated = (lamina) => getTotalCount(lamina) >= 2;
-  const shouldDisplayLamina = (lamina) => {
-    if (viewMode === "tengo") {
-      return getOwnedCount(lamina.id) > 0;
-    }
-    if (viewMode === "faltantes") {
-      return getOwnedCount(lamina.id) === 0;
-    }
-    if (viewMode === "repetidas") {
-      return isRepeated(lamina);
-    }
+  const isSelected  = (lamina) => getPending(lamina.id) > 0;
+  // "collected" = tiene al menos 1 en Firestore O pendiente
+  const isCollected = (lamina) => getTotal(lamina) > 0;
+  const isRepeated  = (lamina) => getTotal(lamina) >= 2;
+
+  const shouldShow = (lamina) => {
+    if (viewMode === "tengo")     return getOwned(lamina.id) > 0;
+    if (viewMode === "faltantes") return getOwned(lamina.id) === 0;
+    if (viewMode === "repetidas") return isRepeated(lamina);
     return true;
   };
 
+  // ── Firestore: láminas del mundial ──────────
   useEffect(() => {
-
-    if (!album || !album.idMundial) {
-      setLoading(false);
-      return;
-    }
-
+    if (!album?.idMundial) { setLoading(false); return; }
     setLoading(true);
-    const mundialRef = doc(db, "mundial", album.idMundial);
 
-    const unsubscribeMundial = onSnapshot(
-      mundialRef,
-      (mundialSnap) => {
-        if (mundialSnap.exists()) {
-          const data = mundialSnap.data();
-          const laminasMap = data.laminas || {};
-          const laminasArray = Object.values(laminasMap);
-
-          // ORDENAR:
-          // 1. Grupo
-          // 2. Equipo
-          // 3. Número
-          laminasArray.sort((a, b) => {
-            const grupoA = String(a.grupo || "");
-            const grupoB = String(b.grupo || "");
-            const abrevA = String(a.abreviacion || "");
-            const abrevB = String(b.abreviacion || "");
-
-            if (grupoA < grupoB) return -1;
-            if (grupoA > grupoB) return 1;
-            if (abrevA < abrevB) return -1;
-            if (abrevA > abrevB) return 1;
-
-            return Number(a.numero || 0) - Number(b.numero || 0);
-          });
-
-          setLaminas(laminasArray);
-        }
-
-        setLoading(false);
-      },
-      (error) => {
-        console.error("Error cargando láminas:", error);
-        setLoading(false);
-      }
-    );
-
-    return () => unsubscribeMundial();
-  }, [album]);
-
-  useEffect(() => {
-    if (!album?.id) return;
-
-    const ref = doc(db, "album_usuario", album.id);
-    const unsubscribeAlbum = onSnapshot(
-      ref,
+    const unsub = onSnapshot(
+      doc(db, "mundial", album.idMundial),
       (snap) => {
         if (snap.exists()) {
-          setOwnedLaminas(snap.data()?.laminas || {});
-        } else {
-          setOwnedLaminas({});
+          const arr = Object.values(snap.data().laminas || {});
+          arr.sort((a, b) => {
+            const gA = String(a.grupo || ""), gB = String(b.grupo || "");
+            const eA = String(a.abreviacion || ""), eB = String(b.abreviacion || "");
+            if (gA < gB) return -1; if (gA > gB) return 1;
+            if (eA < eB) return -1; if (eA > eB) return 1;
+            return Number(a.numero || 0) - Number(b.numero || 0);
+          });
+          setLaminas(arr);
         }
+        setLoading(false);
       },
-      (error) => {
-        console.error("Error cargando colección del álbum:", error);
-      }
+      (err) => { console.error(err); setLoading(false); }
     );
+    return () => unsub();
+  }, [album]);
 
-    return () => unsubscribeAlbum();
+  // ── Firestore: álbum usuario ─────────────────
+  useEffect(() => {
+    if (!album?.id) return;
+    const unsub = onSnapshot(
+      doc(db, "album_usuario", album.id),
+      (snap) => setOwnedLaminas(snap.exists() ? snap.data()?.laminas || {} : {}),
+      console.error
+    );
+    return () => unsub();
   }, [album?.id]);
 
-  // mostrar/ocultar loader global según estado local de carga
+  // ── Loader global ────────────────────────────
   useEffect(() => {
-    if (typeof window !== "undefined" && window.WCLoader) {
-      if (loading) window.WCLoader.show();
-      else window.WCLoader.hide();
-    }
+    if (window.WCLoader) loading ? window.WCLoader.show() : window.WCLoader.hide();
   }, [loading]);
 
-  // =========================
-  // AGRUPAR Y CALCULAR %
-  // =========================
+  // ── Tap: sumar pendiente ─────────────────────
+  const toggleLamina = useCallback((id) => {
+    setPendingLaminas((prev) => ({ ...prev, [id]: (Number(prev[id] || 0)) + 1 }));
+  }, []);
 
+  // ── Long-press: abrir modal ──────────────────
+  const openEditModal = useCallback((lamina) => setEditModal({ lamina }), []);
+
+  // ── Confirmar edición (escribe directo en Firestore) ──
+  const handleEditConfirm = useCallback(async (newQty) => {
+    const { lamina } = editModal;
+    setEditModal(null);
+    if (!album?.id) return;
+
+    try {
+      const ref = doc(db, "album_usuario", album.id);
+
+      if (newQty === 0) {
+        // deleteField() sí elimina la clave aunque usemos merge
+        await updateDoc(ref, { [`laminas.${lamina.id}`]: deleteField() });
+      } else {
+        await setDoc(ref, { laminas: { [lamina.id]: newQty } }, { merge: true });
+      }
+
+      // También limpiar cualquier pendiente de esa lámina
+      setPendingLaminas((prev) => {
+        const next = { ...prev };
+        delete next[lamina.id];
+        return next;
+      });
+
+      showToast(
+        newQty === 0
+          ? `"${lamina.nombre}" eliminada del álbum`
+          : `"${lamina.nombre}" actualizada a ${newQty}`,
+        newQty === 0 ? "error" : "success"
+      );
+    } catch (err) {
+      console.error(err);
+      showToast("No se pudo actualizar la lámina", "error");
+    }
+  }, [editModal, album?.id]);
+
+  // ── Guardar pendientes masivos ───────────────
+  const pendingCount = Object.values(pendingLaminas).reduce((s, v) => s + Number(v || 0), 0);
+
+  const savePending = async () => {
+    if (!album?.id || pendingCount === 0) return;
+    setSavingSelection(true);
+    try {
+      const ref  = doc(db, "album_usuario", album.id);
+      const snap = await getDoc(ref);
+      const existing = snap.exists() ? snap.data()?.laminas || {} : {};
+      const updated  = { ...existing };
+
+      Object.entries(pendingLaminas).forEach(([id, qty]) => {
+        const amount = Number(qty || 0);
+        if (amount <= 0) return;
+        updated[id] = Number(updated[id] || 0) + amount;
+      });
+
+      await setDoc(ref, { laminas: updated }, { merge: true });
+      setPendingLaminas({});
+
+      showToast(
+        `${pendingCount} lámina${pendingCount === 1 ? "" : "s"} guardada${pendingCount === 1 ? "" : "s"}`,
+        "success"
+      );
+    } catch (err) {
+      console.error(err);
+      showToast("No se pudieron guardar las láminas", "error");
+    } finally {
+      setSavingSelection(false);
+    }
+  };
+
+  // ── Agrupar ──────────────────────────────────
   const grupos = {};
   const gruposStats = {};
 
   laminas.forEach((lamina) => {
-    const collected = isCollected(lamina);
-    const grupo = lamina.grupo || "Sin grupo";
+    const grupo  = lamina.grupo        || "Sin grupo";
+    const equipo = lamina.abreviacion  || "Sin equipo";
+    const col    = isCollected(lamina);
 
-      const equipo =
-        lamina.abreviacion ||
-        "Sin equipo";
+    if (!grupos[grupo])       { grupos[grupo] = {}; gruposStats[grupo] = { total: 0, collected: 0 }; }
+    if (!grupos[grupo][equipo]) grupos[grupo][equipo] = [];
 
-      if (
-        !grupos[grupo]
-      ) {
-
-        grupos[grupo] = {};
-        gruposStats[grupo] = {
-          total: 0,
-          collected: 0,
-        };
-      }
-
-      if (
-        !grupos[grupo][
-          equipo
-        ]
-      ) {
-
-        grupos[grupo][
-          equipo
-        ] = [];
-      }
-
-      gruposStats[grupo].total += 1;
-
-      if (collected) {
-        gruposStats[grupo].collected += 1;
-      }
-
-      grupos[grupo][
-        equipo
-      ].push(lamina);
-    }
-  );
-
-  // =========================
-  // CALCULAR PORCENTAJE
-  // =========================
-
-  const getGroupPercentage = (group) => {
-    const stats = gruposStats[group];
-    if (!stats || stats.total === 0)
-      return 0;
-    return Math.round(
-      (stats.collected /
-        stats.total) *
-        100
-    );
-  };
-
-  // =========================
-  // TOGGLE LAMINA
-  // =========================
-
-  const toggleLamina = (laminaId) => {
-  setSelectedLaminas((prev) => {
-    const updated = { ...prev };
-    const currentQty = Number(updated[laminaId] || 0);
-
-    updated[laminaId] = currentQty + 1;
-
-    return updated;
+    gruposStats[grupo].total++;
+    if (col) gruposStats[grupo].collected++;
+    grupos[grupo][equipo].push(lamina);
   });
-};
 
-  const selectedCount = Object.values(selectedLaminas).reduce(
-    (sum, value) => sum + Number(value || 0),
-    0
-  );
-
-  const saveSelectedLaminas = async () => {
-  if (!album?.id || selectedCount === 0) return;
-
-  setSavingSelection(true);
-
-  try {
-    const ref = doc(db, "album_usuario", album.id);
-
-    const snap = await getDoc(ref);
-
-    let existing = {};
-
-    if (snap.exists()) {
-      existing = snap.data()?.laminas || {};
-    }
-
-    const updated = { ...existing };
-
-    Object.entries(selectedLaminas).forEach(([laminaId, qty]) => {
-      const amount = Number(qty || 0);
-
-      if (amount <= 0) return;
-
-      updated[laminaId] =
-        Number(updated[laminaId] || 0) + amount;
-    });
-
-    await setDoc(
-      ref,
-      { laminas: updated },
-      { merge: true }
-    );
-
-    setSelectedLaminas({});
-
-    showToast(
-      `${selectedCount} lámina${
-        selectedCount === 1 ? "" : "s"
-      } agregada${selectedCount === 1 ? "" : "s"} al álbum`,
-      "success"
-    );
-
-  } catch (error) {
-    console.error(
-      "Error guardando láminas seleccionadas:",
-      error
-    );
-
-    showToast(
-      "No se pudieron guardar las láminas",
-      "error"
-    );
-
-  } finally {
-    setSavingSelection(false);
-  }
-};
-
-  // =========================
-  // LOADING
-  // =========================
+  const getGroupPct = (g) => {
+    const s = gruposStats[g];
+    return !s || s.total === 0 ? 0 : Math.round((s.collected / s.total) * 100);
+  };
 
   if (loading) return null;
 
@@ -299,77 +382,46 @@ const Contenido = ({
 
       {/* HEADER */}
       <div className="contenido-header">
-
-        <button
-          className="back-button"
-          onClick={onBack}
-        >
-
-          <ArrowLeft
-            size={20}
-          />
-
-          Volver
-
+        <button className="back-button" onClick={onBack}>
+          <ArrowLeft size={18} /> Volver
         </button>
-
-        <h1>
-          {
-            album.nombreAlbum
-          }
-        </h1>
-
-        <button
-          className="add-cards-btn"
-          onClick={() => setSwitchOpen(true)}
-        >
-          +Tarjetas
+        <h1>{album.nombreAlbum}</h1>
+        <button className="add-cards-btn" onClick={() => setSwitchOpen(true)}>
+          + Tarjetas
         </button>
-
       </div>
 
-      {/* SEARCH INPUT */}
+      {/* BUSCADOR */}
       <div className="search-container">
         <input
           type="text"
-          placeholder="Buscar por abreviatura o equipo..."
+          placeholder="Buscar por abreviatura o equipo…"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
           className="search-input"
         />
       </div>
 
+      {/* FILTROS */}
       <div className="view-mode-buttons">
-        <button
-          type="button"
-          className={viewMode === "all" ? "mode-filter active" : "mode-filter"}
-          onClick={() => setViewMode("all")}
-        >
-          Mostrar todo
-        </button>
-        <button
-          type="button"
-          className={viewMode === "tengo" ? "mode-filter active" : "mode-filter"}
-          onClick={() => setViewMode("tengo")}
-        >
-          Mostrar que tengo
-        </button>
-        <button
-          type="button"
-          className={viewMode === "faltantes" ? "mode-filter active" : "mode-filter"}
-          onClick={() => setViewMode("faltantes")}
-        >
-          Mostrar faltantes
-        </button>
-        <button
-          type="button"
-          className={viewMode === "repetidas" ? "mode-filter active" : "mode-filter"}
-          onClick={() => setViewMode("repetidas")}
-        >
-          Mostrar repetidas
-        </button>
+        {[
+          { key: "all",       label: "Todo"      },
+          { key: "tengo",     label: "Tengo"     },
+          { key: "faltantes", label: "Faltantes" },
+          { key: "repetidas", label: "Repetidas" },
+        ].map(({ key, label }) => (
+          <button
+            key={key}
+            type="button"
+            className={`mode-filter${viewMode === key ? " active" : ""}`}
+            onClick={() => setViewMode(key)}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
+      {/* SWITCH CARDS */}
       {switchOpen && (
         <SwitchCards
           onClose={() => setSwitchOpen(false)}
@@ -379,110 +431,69 @@ const Contenido = ({
         />
       )}
 
+      {/* GRUPOS */}
       {Object.keys(grupos).map((grupo) => {
-        const normalizedSearch = searchTerm.trim().toLowerCase();
-        const searchEnabled = normalizedSearch.length >= 2;
+        const norm = searchTerm.trim().toLowerCase();
+        const searchEnabled = norm.length >= 2;
 
-        const equiposFiltrados = Object.entries(grupos[grupo]).reduce(
-          (acc, [equipo, equipoLaminas]) => {
-            const teamName = equipoLaminas[0]?.nombre || equipo;
-            const teamMatches =
-              !searchEnabled ||
-              equipo.toLowerCase().includes(normalizedSearch) ||
-              teamName.toLowerCase().includes(normalizedSearch);
+        const equiposFiltrados = Object.entries(grupos[grupo]).reduce((acc, [equipo, eqLaminas]) => {
+          const teamName = eqLaminas[0]?.nombre || equipo;
+          const matches =
+            !searchEnabled ||
+            equipo.toLowerCase().includes(norm) ||
+            teamName.toLowerCase().includes(norm);
 
-            const visibleLaminas = equipoLaminas.filter(shouldDisplayLamina);
-            if (!teamMatches || visibleLaminas.length === 0) {
-              return acc;
-            }
+          const visible = eqLaminas.filter(shouldShow);
+          if (!matches || visible.length === 0) return acc;
+          acc.push({ equipo, teamName, laminas: visible });
+          return acc;
+        }, []);
 
-            acc.push({ equipo, teamName, laminas: visibleLaminas });
-            return acc;
-          },
-          []
-        );
-
-        if (equiposFiltrados.length === 0) {
-          return null;
-        }
+        if (equiposFiltrados.length === 0) return null;
 
         const isOpen = searchEnabled ? true : selectedGroup === grupo;
+        const pct    = getGroupPct(grupo);
 
         return (
           <div key={grupo} className="grupo-section">
-            {/* HEADER */}
             <button
-              className={`grupo-header ${getGroupPercentage(grupo) === 100 ? "complete" : ""}`}
+              className={`grupo-header${pct === 100 ? " complete" : ""}`}
               onClick={() => setSelectedGroup(isOpen ? null : grupo)}
             >
               <div>
                 <h2 className="grupo-title">Grupo {grupo}</h2>
                 <div className="grupo-progress-wrapper">
                   <p className="grupo-progress">
-                    {gruposStats[grupo].collected}/{gruposStats[grupo].total}
-                    {" • "}
-                    {getGroupPercentage(grupo)}%
+                    {gruposStats[grupo].collected}/{gruposStats[grupo].total} · {pct}%
                   </p>
                   <div className="grupo-bar">
-                    <div
-                      className="grupo-fill"
-                      style={{ width: `${getGroupPercentage(grupo)}%` }}
-                    />
+                    <div className="grupo-fill" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               </div>
-              <ChevronDown
-                size={24}
-                className={`grupo-icon ${isOpen ? "open" : ""}`}
-              />
+              <ChevronDown size={22} className={`grupo-icon${isOpen ? " open" : ""}`} />
             </button>
 
-            {/* CONTENIDO */}
             {isOpen && (
               <div className="grupo-content">
-                {equiposFiltrados.map(({ equipo, teamName, laminas: equipoLaminas }) => (
+                {equiposFiltrados.map(({ equipo, teamName, laminas: eqL }) => (
                   <div key={equipo} className="equipo-section">
                     <h3 className="equipo-title">
                       {equipo}
                       {teamName && teamName.toLowerCase() !== equipo.toLowerCase()
-                        ? ` • ${teamName}`
-                        : ""}
+                        ? ` · ${teamName}` : ""}
                     </h3>
-
                     <div className="laminas-grid">
-                      {equipoLaminas.map((lamina) => (
-                        <div
+                      {eqL.map((lamina) => (
+                        <LaminaCard
                           key={lamina.id}
-                          className={`lamina-card ${
-                            isCollected(lamina) ? "collected" : ""
-                          } ${isSelected(lamina) ? "selected" : ""}`}
-                          onClick={() => toggleLamina(lamina.id)}
-                        >
-                          <img
-                            src={lamina.bandera}
-                            alt={lamina.nombre}
-                            className={`lamina-image ${isCollected(lamina) ? "owned" : ""}`}
-                          />
-
-                          <div className="lamina-info">
-                            <h4>{lamina.nombre}</h4>
-                            <p style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                              {String(lamina.id) === "00"
-                                ? <span style={{ fontWeight: 700, color: 'var(--primary)' }}>#00</span>
-                                : <>
-                                    <span>#{lamina.numero}</span>
-                                    <small style={{ color: 'var(--text-muted)', fontWeight: 700 }}>{lamina.id}</small>
-                                  </>
-                              }
-                            </p>
-                          </div>
-
-                          {getTotalCount(lamina) >= 2 && (
-                            <div className="lamina-count-badge">
-                              {getTotalCount(lamina)}
-                            </div>
-                          )}
-                        </div>
+                          lamina={lamina}
+                          collected={isCollected(lamina)}
+                          selected={isSelected(lamina)}
+                          totalCount={getTotal(lamina)}
+                          onTap={toggleLamina}
+                          onLongPress={openEditModal}
+                        />
                       ))}
                     </div>
                   </div>
@@ -493,18 +504,29 @@ const Contenido = ({
         );
       })}
 
-      {selectedCount > 0 && (
+      {/* GUARDAR FLOTANTE */}
+      {pendingCount > 0 && (
         <button
           className="guardar-button"
-          onClick={saveSelectedLaminas}
+          onClick={savePending}
           disabled={savingSelection}
         >
           {savingSelection
-            ? "Guardando..."
-            : `Guardar ${selectedCount} lámina${selectedCount === 1 ? "" : "s"}`}
+            ? "Guardando…"
+            : `Guardar ${pendingCount} lámina${pendingCount === 1 ? "" : "s"}`}
         </button>
       )}
 
+      {/* MODAL EDICIÓN */}
+      {editModal && (
+        <EditQtyModal
+          lamina={editModal.lamina}
+          // Le pasamos SOLO lo que hay en Firestore, no sumamos pending
+          initialQty={getOwned(editModal.lamina.id)}
+          onConfirm={handleEditConfirm}
+          onClose={() => setEditModal(null)}
+        />
+      )}
     </div>
   );
 };

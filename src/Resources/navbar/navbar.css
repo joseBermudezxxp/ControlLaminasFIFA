@@ -12,7 +12,7 @@
 
   padding: 0 30px;
 
-  background: var(--bg-cards);
+  background: #1e293b;
 
   /* ✅ color sólido completo */
   opacity: 1;
@@ -27,7 +27,7 @@
   top: 0;
   left: 0;
 
-  z-index: 1000;
+  z-index: 100;
 
   transition:
     transform 0.35s ease,
@@ -231,7 +231,7 @@
 
   transition: 0.3s ease;
 
-  z-index: 1200;
+  z-index: 101;
 }
 
 .overlay.show {
@@ -259,7 +259,7 @@
 
   box-shadow: var(--shadow-lg);
 
-  z-index: 1300;
+  z-index: 6200;
 
   transition: 0.35s ease;
 
