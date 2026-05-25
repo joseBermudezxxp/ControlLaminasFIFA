@@ -483,6 +483,25 @@
   transform: none;
 }
 
+.revert-button {
+  background: #ef4444;
+  box-shadow: 0 6px 24px rgba(239,68,68,.35);
+
+  /* NUEVO */
+  bottom: 80px;
+}
+
+.revert-button:hover {
+  background: #dc2626;
+  box-shadow: 0 8px 28px rgba(239,68,68,.45);
+}
+
+.revert-button:disabled {
+  background: var(--text-muted);
+  color: #fff;
+  box-shadow: none;
+}
+
 /* ========================
    MODAL DE EDICIÓN (long-press)
 ======================== */
@@ -681,10 +700,23 @@
   .search-input { max-width: 100%; }
   .grupo-title { font-size: 1rem; }
   .equipo-title { font-size: 0.97rem; }
-  .laminas-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
+  .laminas-grid { 
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+    gap: 12px; 
+  }
   .lamina-image { height: 115px; }
   .grupo-bar { width: 90px; }
-  .guardar-button { right: 14px; bottom: 14px; padding: 12px 20px; font-size: 0.92rem; }
+
+  .guardar-button {
+    right: 14px;
+    bottom: 14px;
+    padding: 12px 20px;
+    font-size: 0.92rem;
+  }
+
+  .revert-button {
+    bottom: 60px;
+  }
 }
 
 @media (max-width: 420px) {

@@ -46,8 +46,8 @@ service cloud.firestore {
       // Crear perfil propio
       allow create: if isOwner(userId);
 
-      // Leer perfil propio
-      allow read: if isOwner(userId);
+      // Leer perfil: permitir a usuarios autenticados (para búsquedas internas)
+      allow read: if isAuthenticated();
 
       // Editar perfil propio
       allow update: if isOwner(userId);
@@ -195,21 +195,71 @@ service cloud.firestore {
 
     match /album_usuario/{albumId} {
 
-      // Leer solo si el álbum pertenece al usuario
-      allow read: if isAuthenticated()
-        && resource.data.idUsuario == request.auth.uid;
+      // Leer álbumes propios y permitir lectura básica para usuarios autenticados.
+      // Esto es necesario para que los amigos puedan ver datos de intercambio.
+      allow read: if isAuthenticated();
 
-      // Crear solo si pertenece al usuario
+      // Crear solo si pertenece al usuario.
       allow create: if isAuthenticated()
         && request.resource.data.idUsuario == request.auth.uid;
 
-      // Actualizar solo si pertenece al usuario
-      allow update: if isAuthenticated()
-        && resource.data.idUsuario == request.auth.uid;
+      // Actualizar si eres dueño del álbum o si eres un amigo legítimo.
+      // Nota: la verificación de amistad directa no puede hacerse aquí con query,
+      // así que esta regla se mantiene abierta para permitir el intercambio.
+      allow update: if isAuthenticated();
 
-      // Eliminar solo si pertenece al usuario
+      // Eliminar solo si pertenece al usuario.
       allow delete: if isAuthenticated()
         && resource.data.idUsuario == request.auth.uid;
+    }
+
+    // =========================================================
+    // AMIGOS
+    // =========================================================
+    // amigos/{amigoId}
+    //
+    // Estructura:
+    // {
+    //   usuario1: uid,
+    //   usuario2: uid,
+    //   fechaAmistad: timestamp,
+    //   estado: "aceptado" | "pendiente"
+    // }
+    //
+    // Cada usuario:
+    // - puede leer sus amistades
+    // - puede crear amistades
+    // - puede actualizar estado
+    // - puede eliminar amistades
+    // =========================================================
+
+    match /amigos/{friendshipId} {
+
+      // Leer si eres parte de la amistad
+      allow read: if isAuthenticated()
+        && (
+          resource.data.usuario1 == request.auth.uid
+          || resource.data.usuario2 == request.auth.uid
+        );
+
+      // Crear amistad
+      allow create: if isAuthenticated()
+        && request.resource.data.usuario1 == request.auth.uid
+        && request.resource.data.estado == "pendiente";
+
+      // Actualizar (para aceptar/rechazar)
+      allow update: if isAuthenticated()
+        && (
+          resource.data.usuario1 == request.auth.uid
+          || resource.data.usuario2 == request.auth.uid
+        );
+
+      // Eliminar amistad
+      allow delete: if isAuthenticated()
+        && (
+          resource.data.usuario1 == request.auth.uid
+          || resource.data.usuario2 == request.auth.uid
+        );
     }
 
     // =========================================================

@@ -4,6 +4,7 @@ import "./adquiriralbum.css";
 import {
   collection,
   getDocs,
+  getDoc,
   doc,
   setDoc,
   serverTimestamp,
@@ -113,6 +114,18 @@ const AdquirirAlbum = ({
       // ID UNICO
       const albumUserId =
         `${user.uid}_${selectedAlbum.id}`;
+
+      const existingAlbum = await getDoc(
+        doc(db, "album_usuario", albumUserId)
+      );
+
+      if (existingAlbum.exists()) {
+        showToast(
+          "Ya tienes este álbum y no puedes volver a adquirirlo sin perder tu progreso.",
+          "error"
+        );
+        return;
+      }
 
       await setDoc(
         doc(

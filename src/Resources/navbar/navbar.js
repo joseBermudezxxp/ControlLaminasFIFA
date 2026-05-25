@@ -18,10 +18,10 @@ import "./navbar.css";
 import {
   Menu,
   X,
-  Settings,
   LogOut,
   Upload,
   BookOpen,
+  Users,
 } from "lucide-react";
 
 const Navbar = ({
@@ -29,6 +29,7 @@ const Navbar = ({
   onOpenCargar,
   onOpenAdquirir,
   onOpenCargarLaminas,
+  onOpenAmigos,
 }) => {
 
   const [open, setOpen] =
@@ -214,13 +215,13 @@ const Navbar = ({
             </>
           )}
 
-          {/* SETTINGS */}
-          <button className="nav-btn">
-
-            <Settings size={18} />
-
-            Ajustes
-
+          {/* AMIGOS */}
+          <button
+            className="nav-btn"
+            onClick={onOpenAmigos}
+          >
+            <Users size={18} />
+            Amigos
           </button>
 
           {/* LOGOUT */}
@@ -373,12 +374,21 @@ const Navbar = ({
             </>
           )}
 
-          {/* SETTINGS */}
-          <button className="mobile-link">
+          {/* AMIGOS */}
+          <button
+            className="mobile-link"
+            onClick={() => {
 
-            <Settings size={20} />
+              onOpenAmigos();
 
-            Ajustes
+              setOpen(false);
+
+            }}
+          >
+
+            <Users size={20} />
+
+            Amigos
 
           </button>
 

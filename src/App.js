@@ -20,6 +20,7 @@ import Cargar from "./Components/adminalbum/cargar";
 import AdquirirAlbum from "./Components/adminalbum/adquiriralbum/adquiriralbum";
 import CargarLaminas from "./Components/adminalbum/cargarlaminas";
 import Contenido from "./Components/home/contenido/contenido";
+import Amigos from "./amigos/amigos";
 
 import Carga from "./Resources/carga/carga";
 import ToastContainer from "./Resources/toast/ToastContainer";
@@ -39,6 +40,7 @@ function App() {
   const [cargarLaminasOpen, setCargarLaminasOpen] = useState(false);
 
   const [selectedAlbum, setSelectedAlbum] = useState(null);
+  const [amigosView, setAmigosView] = useState(false);
 
   // ================= RECARGAR ÁLBUMES =================
   const fetchAlbums = async (uid) => {
@@ -193,9 +195,21 @@ function App() {
             onOpenCargarLaminas={() =>
               setCargarLaminasOpen(true)
             }
+            onOpenAmigos={() =>
+              setAmigosView(true)
+            }
           />
 
-          {selectedAlbum ? (
+          {amigosView ? (
+            <Amigos
+              user={user}
+              albums={albums}
+              onBack={() => {
+                setAmigosView(false);
+                setSelectedAlbum(null);
+              }}
+            />
+          ) : selectedAlbum ? (
             <Contenido
               album={selectedAlbum}
               onBack={() =>

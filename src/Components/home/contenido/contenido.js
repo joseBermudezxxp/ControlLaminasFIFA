@@ -214,6 +214,7 @@ const Contenido = ({ album, onBack }) => {
   const [switchOpen,      setSwitchOpen]      = useState(false);
   const [searchTerm,      setSearchTerm]      = useState("");
   const [editModal,       setEditModal]       = useState(null);
+  const [changeHistory,   setChangeHistory]   = useState([]);   // Historial de cambios para revertir
 
   // ── Helpers ─────────────────────────────────
   // Conteo confirmado en Firestore
@@ -280,10 +281,31 @@ const Contenido = ({ album, onBack }) => {
   // ── Tap: sumar pendiente ─────────────────────
   const toggleLamina = useCallback((id) => {
     setPendingLaminas((prev) => ({ ...prev, [id]: (Number(prev[id] || 0)) + 1 }));
+    // Agregar al historial de cambios para poder revertir
+    setChangeHistory((prev) => [...prev, id]);
   }, []);
 
   // ── Long-press: abrir modal ──────────────────
   const openEditModal = useCallback((lamina) => setEditModal({ lamina }), []);
+
+  // ── Revertir último cambio ───────────────────
+  const revertLastChange = useCallback(() => {
+    if (changeHistory.length === 0) return;
+
+    const newHistory = [...changeHistory];
+    const lastChangedId = newHistory.pop();
+
+    setChangeHistory(newHistory);
+    setPendingLaminas((prev) => {
+      const newQty = Number(prev[lastChangedId] || 0) - 1;
+      if (newQty <= 0) {
+        const updated = { ...prev };
+        delete updated[lastChangedId];
+        return updated;
+      }
+      return { ...prev, [lastChangedId]: newQty };
+    });
+  }, [changeHistory]);
 
   // ── Confirmar edición (escribe directo en Firestore) ──
   const handleEditConfirm = useCallback(async (newQty) => {
@@ -340,6 +362,7 @@ const Contenido = ({ album, onBack }) => {
 
       await setDoc(ref, { laminas: updated }, { merge: true });
       setPendingLaminas({});
+      setChangeHistory([]); // Limpiar historial después de guardar
 
       showToast(
         `${pendingCount} lámina${pendingCount === 1 ? "" : "s"} guardada${pendingCount === 1 ? "" : "s"}`,
@@ -506,15 +529,25 @@ const Contenido = ({ album, onBack }) => {
 
       {/* GUARDAR FLOTANTE */}
       {pendingCount > 0 && (
-        <button
-          className="guardar-button"
-          onClick={savePending}
-          disabled={savingSelection}
-        >
-          {savingSelection
-            ? "Guardando…"
-            : `Guardar ${pendingCount} lámina${pendingCount === 1 ? "" : "s"}`}
-        </button>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px", position: "fixed", right: "20px", bottom: "20px", zIndex: 50, alignItems: "flex-end" }}>
+          <button
+            className="guardar-button revert-button"
+            onClick={revertLastChange}
+            disabled={changeHistory.length === 0}
+            title="Revertir último cambio"
+          >
+            ↶ Revertir
+          </button>
+          <button
+            className="guardar-button"
+            onClick={savePending}
+            disabled={savingSelection}
+          >
+            {savingSelection
+              ? "Guardando…"
+              : `Guardar ${pendingCount} lámina${pendingCount === 1 ? "" : "s"}`}
+          </button>
+        </div>
       )}
 
       {/* MODAL EDICIÓN */}

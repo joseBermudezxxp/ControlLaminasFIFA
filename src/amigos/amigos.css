@@ -1,0 +1,735 @@
+/* amigos.css */
+
+.amigos-container {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  /* Dejar espacio extra arriba para el navbar fijo (75px) */
+  padding: calc(75px + 30px) 30px 30px 30px;
+  box-sizing: border-box;
+  animation: fadeIn 0.35s ease both;
+  position: relative;
+}
+
+/* ========================
+   BOTÓN ATRÁS
+======================== */
+
+.amigos-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  margin-bottom: 24px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.amigos-back-btn:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ========================
+   TABS
+======================== */
+
+.amigos-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  animation: fadeSlideUp 0.4s ease both;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, background 0.2s ease,
+              color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+.tab:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.tab.active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+}
+
+/* ========================
+   SECCIÓN DE AMIGOS
+======================== */
+
+.amigos-section {
+  animation: fadeSlideUp 0.45s ease both;
+}
+
+.amigos-section h2 {
+  margin: 0 0 24px 0;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+/* ========================
+   LISTA DE AMIGOS
+======================== */
+
+.amigos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.amigo-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: 16px;
+  transition: border-color 0.2s ease, background 0.2s ease,
+              transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.amigo-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.amigo-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.amigo-info h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.amigo-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.amigo-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.amigo-album-select {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.amigo-album-select label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.amigo-album-select select {
+  padding: 10px 12px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.94rem;
+}
+
+.btn-exchange,
+.btn-remove {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-exchange {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.btn-exchange:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+.btn-remove {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-remove:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: translateY(-2px);
+}
+
+/* ========================
+   EMPTY STATE
+======================== */
+
+.amigos-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 60px 30px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.amigos-empty p {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.amigos-empty .text-secondary {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.amigos-loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+/* ========================
+   FORMULARIO AGREGAR
+======================== */
+
+.agregar-form {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.search-input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.email-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.email-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
+}
+
+.btn-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  white-space: nowrap;
+}
+
+.btn-search:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+.btn-search:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mensaje {
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+  animation: slideUp 0.3s ease both;
+}
+
+.mensaje.success {
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--success);
+  border: 1px solid rgba(22, 163, 74, 0.3);
+}
+
+.mensaje.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ========================
+   RESULTADO DE BÚSQUEDA
+======================== */
+
+.search-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15);
+  animation: scaleIn 0.3s ease both;
+}
+
+.result-info h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.result-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.btn-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--success);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+}
+
+/* ========================
+   INTERCAMBIOS / CAMBIOS
+======================== */
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.btn-back:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.albums-exchange-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.album-exchange-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.album-exchange-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.album-exchange-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.album-exchange-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+/* ========================
+   DATOS DE CAMBIO
+======================== */
+
+.exchange-container {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.exchange-section {
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: 16px;
+  animation: fadeSlideUp 0.45s ease both;
+}
+
+.exchange-section h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.section-subtitle {
+  margin: 0 0 16px 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.laminas-exchange-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.lamina-exchange-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.lamina-exchange-item:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
+}
+
+.lamina-exchange-item.selected {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #065f46;
+}
+
+.exchange-selection-label {
+  width: 100%;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.exchange-actions {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-exchange-confirm {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 14px;
+  background: var(--success);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.btn-exchange-confirm:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+}
+
+.btn-exchange-confirm:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.exchange-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 16px;
+}
+
+.exchange-loading-card {
+  padding: 22px 28px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  color: var(--text-primary);
+  font-weight: 700;
+  text-align: center;
+}
+
+.exchange-notice {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.lamina-id {
+  font-weight: 700;
+}
+
+.lamina-qty {
+  background: var(--primary);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.empty-exchange {
+  padding: 30px;
+  text-align: center;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  font-size: 0.95rem;
+}
+
+.loading-exchange {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+/* ========================
+   ANIMACIONES
+======================== */
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================
+   RESPONSIVE
+======================== */
+
+@media (max-width: 768px) {
+  .amigos-container {
+    /* navbar ocupa el mismo alto en móvil, ajustar separación */
+    padding: calc(75px + 20px) 20px 20px 20px;
+  }
+
+  .amigos-tabs {
+    margin-bottom: 24px;
+  }
+
+  .tab {
+    flex: 1;
+    justify-content: center;
+    min-width: 100px;
+    font-size: 0.85rem;
+    padding: 9px 12px;
+  }
+
+  .amigo-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .amigo-actions {
+    width: 100%;
+  }
+
+  .btn-exchange {
+    flex: 1;
+  }
+
+  .exchange-container {
+    grid-template-columns: 1fr;
+  }
+
+  .search-input-group {
+    flex-direction: column;
+  }
+
+  .email-input,
+  .btn-search {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .amigos-empty {
+    padding: 40px 20px;
+  }
+
+  .tab {
+    font-size: 0.75rem;
+    padding: 8px 10px;
+    gap: 4px;
+  }
+
+  .tab svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .amigo-card {
+    padding: 14px 16px;
+  }
+
+  .btn-exchange,
+  .btn-remove {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+  }
+
+  .exchange-section h3 {
+    font-size: 0.95rem;
+  }
+}
